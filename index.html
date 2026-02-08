@@ -435,7 +435,7 @@ h1 {
 /* Comparison card - savings (green) */
 .summary-card.savings {
   position: relative;
-  background: #28a745;
+  background: #198131;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
@@ -446,8 +446,8 @@ h1 {
   content: "";
   position: absolute;
   z-index: 0;
-  width: 400px;
-  height: 400px;
+  width: 390px;
+  height: 390px;
   background: white;
   border-radius: 50%;
   top: 50%;
@@ -492,8 +492,8 @@ h1 {
   content: "";
   position: absolute;
   z-index: 0;
-  width: 400px;
-  height: 400px;
+  width: 390px;
+  height: 390px;
   background: white;
   border-radius: 50%;
   top: 50%;
@@ -539,8 +539,8 @@ h1 {
   content: "";
   position: absolute;
   z-index: 0;
-  width: 400px;
-  height: 400px;
+  width: 390px;
+  height: 390px;
   background: white;
   border-radius: 50%;
   top: 50%;
@@ -1194,7 +1194,7 @@ canvas {
       <div class="subtext" id="journeyCount">0 journeys</div>
     </div>
     <div class="summary-card" id="comparisonCard">
-      <div class="label" id="comparisonLabel">vs Monthly Card</div>
+      <div class="label" id="comparisonLabel">Monthly Card</div>
       <div class="value" id="comparison">-</div>
       <div class="subtext" id="comparisonText">Start tracking to compare</div>
     </div>
@@ -1927,7 +1927,7 @@ function updateSummary() {
   const comparisonText = document.getElementById('comparisonText');
   
   const zoneText = userHomeZone === 1 ? 'Zone 1' : `Zones 1-${userHomeZone}`;
-  comparisonLabel.textContent = `vs Monthly Card (${zoneText} - £${monthlyCardCost.toFixed(2)})`;
+  comparisonLabel.textContent = `Monthly Card (${zoneText} - £${monthlyCardCost.toFixed(2)})`;
   
   if (totalSpend === 0) {
     comparisonCard.className = 'summary-card';
