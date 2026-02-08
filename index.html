@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="station-data.js"></script>
+<script src="tfl-api.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
@@ -78,7 +78,7 @@ body {
 h1 {
   text-align: center;
   margin-top: 16px;
-  margin-bottom: 24px; /* Increased gap */
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,9 +102,8 @@ h1 {
 .top-bar-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding-top: 20px;
-  padding-right: 20px;
   margin-bottom: 16px;
 }
 
@@ -216,13 +215,145 @@ h1 {
   padding: 0;
 }
 
+.settings-btn {
+  background: var(--card);
+  border: none;
+  color: var(--text);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: background 0.2s ease;
+  box-shadow: 0 4px 15px var(--shadow-strong);
+}
+
+.settings-btn:hover {
+  background: var(--interactive-bg-hover);
+}
+
+/* Settings Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+}
+
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: var(--interactive-bg);
+  color: var(--text);
+}
+
+.settings-group {
+  margin-bottom: 20px;
+}
+
+.settings-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.settings-group select {
+  width: 100%;
+  background: var(--interactive-bg);
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.settings-info {
+  background: var(--interactive-bg);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.settings-info strong {
+  color: var(--text);
+}
+
+.save-settings-btn {
+  width: 100%;
+  background: var(--accent1);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.save-settings-btn:hover {
+  opacity: 0.9;
+}
+
 /* Summary Cards */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
-  margin-top: 8px; /* Added margin */
+  margin-top: 8px;
 }
 
 .summary-card {
@@ -261,7 +392,6 @@ h1 {
   min-height: 120px; 
 }
 
-/* White curved band */
 .summary-card.savings::before {
   content: "";
   position: absolute;
@@ -275,7 +405,6 @@ h1 {
   transform: translateY(-50%);
 }
 
-/* Main cyan curve */
 .summary-card.savings::after {
   content: "";
   position: absolute;
@@ -285,16 +414,15 @@ h1 {
   background: #00a9e0;
   border-radius: 50%;
   top: 50%;
-  /* Slightly more left than the white circle to create the band effect */
   left: -350px; 
   transform: translateY(-50%);
 }
 
-/* Content z-index fix */
 .summary-card.savings > * {
   position: relative;
   z-index: 1;
 }
+
 .summary-card.savings::before {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
@@ -309,14 +437,13 @@ h1 {
 
 .summary-card.warning {
   position: relative;
-  background: #e0a800; /* Deep amber base */
+  background: #e0a800;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
-    0 2px 8px rgba(255, 193, 7, 0.15); /* Subtle amber glow */
+    0 2px 8px rgba(255, 193, 7, 0.15);
 }
 
-/* White curved band */
 .summary-card.warning::before {
   content: "";
   position: absolute;
@@ -328,24 +455,22 @@ h1 {
   top: 50%;
   left: -180px;
   transform: translateY(-50%);
-  opacity: 0.2; /* Slightly more visible for contrast */
+  opacity: 0.2;
 }
 
-/* Main amber curve */
 .summary-card.warning::after {
   content: "";
   position: absolute;
   z-index: 0;
   width: 400px;
   height: 400px;
-  background: #ffc107; /* Brighter amber */
+  background: #ffc107;
   border-radius: 50%;
   top: 50%;
   left: -200px;
   transform: translateY(-50%);
 }
 
-/* Ensure content appears above curves */
 .summary-card.warning .label,
 .summary-card.warning .value,
 .summary-card.warning .subtext {
@@ -354,7 +479,49 @@ h1 {
   color: #000;
 }
 
+.summary-card.capped {
+  position: relative;
+  background: #28a745;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(0,0,0,0.4),
+    0 2px 8px rgba(40, 167, 69, 0.15);
+}
 
+.summary-card.capped::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: -180px;
+  transform: translateY(-50%);
+  opacity: 0.2;
+}
+
+.summary-card.capped::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+  background: #4caf50;
+  border-radius: 50%;
+  top: 50%;
+  left: -200px;
+  transform: translateY(-50%);
+}
+
+.summary-card.capped .label,
+.summary-card.capped .value,
+.summary-card.capped .subtext {
+  position: relative;
+  z-index: 1;
+  color: #000;
+}
 
 /* Month Tabs */
 .month-tabs, .year-tabs {
@@ -414,7 +581,6 @@ h1 {
   margin-left: 4px;
 }
 
-/* Date-time input styling */
 input[type="datetime-local"] {
   background: #2a2a31;
   border: none;
@@ -424,14 +590,13 @@ input[type="datetime-local"] {
   width: 100%;
   font-size: 0.95rem;
   height: 44px;
-  color-scheme: dark; /* Makes the calendar picker dark themed */
+  color-scheme: dark;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* Makes the calendar icon white */
+  filter: invert(1);
   cursor: pointer;
 }
-
 
 input, select {
   background: #2a2a31;
@@ -441,7 +606,7 @@ input, select {
   color: var(--text);
   width: 100%;
   font-size: 0.95rem;
-  height: 44px; /* Fixed height for consistency */
+  height: 44px;
 }
 
 input:focus, select:focus {
@@ -475,6 +640,17 @@ button.disabled {
   opacity: 0.7;
 }
 
+.loading-indicator {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+  display: none;
+}
+
+.loading-indicator.active {
+  display: block;
+}
+
 /* Station Input with Autocomplete */
 .station-input-wrapper {
   position: relative;
@@ -492,7 +668,7 @@ button.disabled {
   overflow-y: auto;
   z-index: 100;
   display: none;
-  min-width: 350px; /* Wider dropdown */
+  min-width: 350px;
 }
 
 .station-suggestion-item {
@@ -502,7 +678,7 @@ button.disabled {
   align-items: center;
   gap: 10px;
   border-bottom: 1px solid #2a2a31;
-  white-space: nowrap; /* Keep everything on one line */
+  white-space: nowrap;
 }
 
 .station-suggestion-item:last-child {
@@ -592,6 +768,10 @@ button.disabled {
   background: var(--dlr);
 }
 
+.line-badge.bus {
+  background: var(--bus);
+}
+
 /* Journey List */
 .journey-date-group {
   margin-bottom: 20px;
@@ -612,6 +792,12 @@ button.disabled {
 .date-total {
   font-size: 0.85rem;
   color: var(--accent1);
+}
+
+.date-capped {
+  font-size: 0.75rem;
+  color: var(--success);
+  margin-left: 8px;
 }
 
 .journey-item {
@@ -882,15 +1068,18 @@ canvas {
   .date-total {
     font-size: 0.8rem;
   }
+  
   .summary-card.savings::before,
-  .summary-card.warning::before {
+  .summary-card.warning::before,
+  .summary-card.capped::before {
     width: 300px;
     height: 300px;
     left: -140px;
   }
   
   .summary-card.savings::after,
-  .summary-card.warning::after {
+  .summary-card.warning::after,
+  .summary-card.capped::after {
     width: 300px;
     height: 300px;
     left: -155px;
@@ -919,7 +1108,7 @@ canvas {
 <body>
 
 <div id="appContentWrapper" class="container">
-  <!-- User Menu -->
+  <!-- Top Bar with User Menu and Settings -->
   <div class="top-bar-container">
     <div id="user-menu">
       <input type="checkbox" id="userMenuToggle" />
@@ -936,13 +1125,16 @@ canvas {
         </div>
       </div>
     </div>
+    
+    <button class="settings-btn" onclick="openSettings()">
+      <i class="fa-solid fa-gear"></i>
+    </button>
   </div>
 
   <h1>
-  <img src="assets/logos/tfl.png" alt="TFL" class="tfl-logo">
-  TFL Journey Tracker
-</h1>
-
+    <img src="assets/logos/tfl.png" alt="TFL" class="tfl-logo">
+    TFL Journey Tracker
+  </h1>
 
   <!-- Summary Cards -->
   <div class="summary-grid">
@@ -952,9 +1144,14 @@ canvas {
       <div class="subtext" id="journeyCount">0 journeys</div>
     </div>
     <div class="summary-card" id="comparisonCard">
-      <div class="label">vs Monthly Card (£164.70)</div>
+      <div class="label" id="comparisonLabel">vs Monthly Card</div>
       <div class="value" id="comparison">-</div>
       <div class="subtext" id="comparisonText">Start tracking to compare</div>
+    </div>
+    <div class="summary-card" id="dailyCapCard">
+      <div class="label">Today's Travel</div>
+      <div class="value" id="todaySpend">£0.00</div>
+      <div class="subtext" id="capStatus">No journeys today</div>
     </div>
   </div>
 
@@ -991,7 +1188,7 @@ canvas {
         </select>
       </div>
       <div class="form-group station-input-wrapper">
-        <label>From</label>
+        <label id="originLabel">From</label>
         <input id="originInput" type="text" placeholder="Origin station" autocomplete="off">
         <div id="originSuggestions" class="station-suggestions"></div>
       </div>
@@ -1003,6 +1200,9 @@ canvas {
       <div class="form-group">
         <label>Price</label>
         <input id="priceInput" type="number" step="0.01" placeholder="£" required>
+        <div class="loading-indicator" id="priceLoadingIndicator">
+          <i class="fa-solid fa-spinner fa-spin"></i> Calculating...
+        </div>
       </div>
       <button onclick="addJourney()" style="margin-top: 18px;">
         <i class="fa-solid fa-plus"></i> Add
@@ -1022,13 +1222,49 @@ canvas {
   </div>
 </div>
 
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Settings</h2>
+      <button class="close-btn" onclick="closeSettings()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    
+    <div class="settings-group">
+      <label for="homeZoneSelect">Your Home Zone</label>
+      <select id="homeZoneSelect">
+        <option value="1">Zone 1</option>
+        <option value="2">Zone 2</option>
+        <option value="3">Zone 3</option>
+        <option value="4" selected>Zone 4</option>
+        <option value="5">Zone 5</option>
+        <option value="6">Zone 6</option>
+        <option value="7">Zone 7</option>
+        <option value="8">Zone 8</option>
+        <option value="9">Zone 9</option>
+      </select>
+      
+      <div class="settings-info">
+        <strong>Monthly Travelcard Cost:</strong> <span id="travelcardCostDisplay">£246.60</span><br>
+        <small>This is used to compare your contactless spending vs getting an Oyster monthly Travelcard</small>
+      </div>
+    </div>
+    
+    <button class="save-settings-btn" onclick="saveSettings()">
+      <i class="fa-solid fa-check"></i> Save Settings
+    </button>
+  </div>
+</div>
+
 <!-- Footer -->
 <div class="footer">
   <a href="https://www.linkedin.com/in/francisarcas/" target="_blank" class="footer-link" title="Francis Arcas LinkedIn">
     <i class="fa-brands fa-linkedin footer-icon"></i>
   </a>
   <span style="margin: 0 10px;">|</span>
-  <a href="https://github.com/francisarcas/tfl-tracker" target="_blank" class="footer-link" title="TFL Tracker GitHub">
+  <a href="https://github.com/francisarcas/tfl-journey-tracker" target="_blank" class="footer-link" title="TFL Tracker GitHub">
     <i class="fa-brands fa-github footer-icon"></i>
   </a>
 </div>
@@ -1036,93 +1272,69 @@ canvas {
 <script>
 // Global variables
 const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-const MONTHLY_CARD_COST = 171.70;
+
+// Monthly Travelcard prices (28-day, Adult, 2026 rates)
+const MONTHLY_TRAVELCARD_PRICES = {
+  '1': 171.70,
+  '1-2': 171.70,
+  '1-3': 201.60,
+  '1-4': 246.60,
+  '1-5': 293.40,
+  '1-6': 313.40,
+  '1-7': 341.40,
+  '1-8': 402.90,
+  '1-9': 447.00,
+  '2': 128.70,
+  '2-3': 128.70,
+  '2-4': 142.50,
+  '2-5': 170.90,
+  '2-6': 214.70,
+  '3': 128.70,
+  '3-4': 128.70,
+  '3-5': 142.50,
+  '3-6': 170.90,
+  '4': 128.70,
+  '4-5': 128.70,
+  '4-6': 142.50,
+  '5': 128.70,
+  '5-6': 128.70,
+  '6': 128.70
+};
+
+// Daily caps for different zone combinations (2026 rates)
+const DAILY_CAPS = {
+  'bus': 5.25,
+  '1': 8.90,
+  '1-2': 8.90,
+  '1-3': 10.50,
+  '1-4': 12.80,
+  '1-5': 15.30,
+  '1-6': 16.30,
+  '1-7': 17.80,
+  '1-8': 21.00,
+  '1-9': 23.30,
+  '2': 8.90,
+  '2-3': 10.50,
+  '2-4': 12.80,
+  '2-5': 15.30,
+  '2-6': 16.30
+};
 
 const today = new Date();
 let activeYear = today.getFullYear();
 let activeMonth = `${activeYear}-${MONTHS[today.getMonth()]}`;
 
 let journeys = [];
-
-// TFL Fare Data (2026 prices)
-const FARE_DATA = {
-  single: {
-    '1-1': { peak: 3.10, offPeak: 3.00 },
-    '1-2': { peak: 3.60, offPeak: 3.10 },
-    '1-3': { peak: 4.20, offPeak: 3.50 },
-    '1-4': { peak: 4.80, offPeak: 3.80 },
-    '1-5': { peak: 5.40, offPeak: 3.80 },
-    '1-6': { peak: 5.90, offPeak: 4.20 },
-    '2-2': { peak: 2.10, offPeak: 1.90 },
-    '2-3': { peak: 2.50, offPeak: 2.10 },
-    '2-4': { peak: 2.80, offPeak: 2.30 },
-    '2-5': { peak: 3.20, offPeak: 2.50 },
-    '2-6': { peak: 3.50, offPeak: 2.70 },
-    '3-3': { peak: 2.10, offPeak: 1.90 },
-    '3-4': { peak: 2.40, offPeak: 2.00 },
-    '3-5': { peak: 2.70, offPeak: 2.20 },
-    '3-6': { peak: 3.00, offPeak: 2.40 },
-    '4-4': { peak: 2.10, offPeak: 1.90 },
-    '4-5': { peak: 2.40, offPeak: 2.00 },
-    '4-6': { peak: 2.70, offPeak: 2.20 },
-    '5-5': { peak: 2.10, offPeak: 1.90 },
-    '5-6': { peak: 2.40, offPeak: 2.00 },
-    '6-6': { peak: 2.10, offPeak: 1.90 }
-  },
-  bus: 1.75,
-  tram: 1.75
-};
-
-// Helper functions
-function isPeakTime(timeString) {
-  if (!timeString) return true;
-  
-  const [hours, minutes] = timeString.split(':').map(Number);
-  const totalMinutes = hours * 60 + minutes;
-  
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  
-  if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-  
-  const morningPeakStart = 6 * 60 + 30;
-  const morningPeakEnd = 9 * 60 + 30;
-  const eveningPeakStart = 16 * 60;
-  const eveningPeakEnd = 19 * 60;
-  
-  return (totalMinutes >= morningPeakStart && totalMinutes <= morningPeakEnd) ||
-         (totalMinutes >= eveningPeakStart && totalMinutes <= eveningPeakEnd);
-}
-
-function getStationZones(stationName) {
-  return STATION_ZONES[stationName] || [1];
-}
-
-function calculateFare(transport, origin, destination, time) {
-  if (transport === 'bus' || transport === 'tram') {
-    return FARE_DATA.bus;
-  }
-  
-  const originZones = getStationZones(origin);
-  const destinationZones = destination ? getStationZones(destination) : originZones;
-  
-  const minOriginZone = Math.min(...originZones);
-  const maxDestZone = destination ? Math.max(...destinationZones) : minOriginZone;
-  
-  const zoneKey = `${minOriginZone}-${maxDestZone}`;
-  
-  if (FARE_DATA.single[zoneKey]) {
-    const isPeak = isPeakTime(time);
-    return isPeak ? FARE_DATA.single[zoneKey].peak : FARE_DATA.single[zoneKey].offPeak;
-  }
-  
-  const zoneDiff = maxDestZone - minOriginZone;
-  return 3.00 + (zoneDiff * 0.50);
-}
+let isCalculatingFare = false;
+let userHomeZone = 4; // Default to Zone 4
+let monthlyCardCost = 246.60; // Default for Zone 1-4
 
 function initApp() {
-  console.log('TFL Journey Tracker - Development Mode');
+  console.log('TFL Journey Tracker - Contactless vs Oyster Comparison Tool');
   console.log('Total stations loaded:', TFL_STATIONS.length);
+  
+  // Load user settings
+  loadUserSettings();
   
   const now = new Date();
   const year = now.getFullYear();
@@ -1131,7 +1343,6 @@ function initApp() {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
-
   
   renderYears();
   renderMonths();
@@ -1143,8 +1354,95 @@ function initApp() {
   setupStationAutocomplete('destinationInput', 'destinationSuggestions');
   setupAutoPriceCalculation();
   
+  // Update travelcard cost display in settings
+  updateTravelcardCostDisplay();
+  
   loadJourneys();
   updateAll();
+}
+
+function loadUserSettings() {
+  const savedZone = localStorage.getItem('tfl_user_home_zone');
+  if (savedZone) {
+    userHomeZone = parseInt(savedZone);
+    monthlyCardCost = getMonthlyCardCost(userHomeZone);
+  }
+}
+
+function saveUserSettings() {
+  localStorage.setItem('tfl_user_home_zone', userHomeZone.toString());
+}
+
+function getMonthlyCardCost(homeZone) {
+  // Always calculate from zone 1 to home zone for comparison
+  const zoneKey = homeZone === 1 ? '1' : `1-${homeZone}`;
+  return MONTHLY_TRAVELCARD_PRICES[zoneKey] || 246.60;
+}
+
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('active');
+  document.getElementById('homeZoneSelect').value = userHomeZone.toString();
+  updateTravelcardCostDisplay();
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function updateTravelcardCostDisplay() {
+  const selectedZone = parseInt(document.getElementById('homeZoneSelect').value);
+  const cost = getMonthlyCardCost(selectedZone);
+  document.getElementById('travelcardCostDisplay').textContent = `£${cost.toFixed(2)}`;
+}
+
+function saveSettings() {
+  userHomeZone = parseInt(document.getElementById('homeZoneSelect').value);
+  monthlyCardCost = getMonthlyCardCost(userHomeZone);
+  saveUserSettings();
+  closeSettings();
+  updateAll();
+  
+  // Show confirmation
+  const btn = document.querySelector('.save-settings-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+  setTimeout(() => {
+    btn.innerHTML = originalText;
+  }, 2000);
+}
+
+// Update zone selector when changed
+document.addEventListener('DOMContentLoaded', () => {
+  const homeZoneSelect = document.getElementById('homeZoneSelect');
+  if (homeZoneSelect) {
+    homeZoneSelect.addEventListener('change', updateTravelcardCostDisplay);
+  }
+});
+
+function getDailyCap(journeyList) {
+  const allBus = journeyList.every(j => j.transport === 'bus' || j.transport === 'tram');
+  
+  if (allBus) {
+    return DAILY_CAPS['bus'];
+  }
+  
+  let maxZone = 1;
+  journeyList.forEach(journey => {
+    if (journey.transport !== 'bus' && journey.transport !== 'tram') {
+      const originZones = getStationZones(journey.origin);
+      const destZones = journey.destination ? getStationZones(journey.destination) : originZones;
+      
+      const highestZone = Math.max(...originZones, ...destZones);
+      maxZone = Math.max(maxZone, highestZone);
+    }
+  });
+  
+  const capKey = maxZone === 1 ? '1' : `1-${maxZone}`;
+  return DAILY_CAPS[capKey] || DAILY_CAPS['1-6'];
+}
+
+function getStationZones(stationName) {
+  return STATION_ZONES[stationName] || [1];
 }
 
 function setupAutoPriceCalculation() {
@@ -1153,28 +1451,51 @@ function setupAutoPriceCalculation() {
   const originInput = document.getElementById('originInput');
   const destinationInput = document.getElementById('destinationInput');
   const priceInput = document.getElementById('priceInput');
+  const loadingIndicator = document.getElementById('priceLoadingIndicator');
   
-  function updatePrice() {
+  async function updatePrice() {
     const transport = transportInput.value;
     const origin = originInput.value.trim();
     const destination = destinationInput.value.trim();
     const dateTime = dateTimeInput.value;
     
-    if (!dateTime) return;
+    if (!dateTime || !origin) return;
+    if (transport !== 'bus' && transport !== 'tram' && !destination) return;
+    if (isCalculatingFare) return;
     
-    const time = dateTime.split('T')[1];
-
-    if (!origin) return;
-    if (transport !== 'bus' && !destination) return;
+    isCalculatingFare = true;
+    loadingIndicator.classList.add('active');
+    priceInput.value = '';
     
-    const calculatedFare = calculateFare(transport, origin, destination, time);
-    priceInput.value = calculatedFare.toFixed(2);
+    try {
+      const fare = await TFL_API.calculateJourneyFare(
+        origin, 
+        (transport === 'bus' || transport === 'tram') ? null : destination, 
+        dateTime
+      );
+      
+      priceInput.value = fare.toFixed(2);
+      console.log(`Calculated fare: £${fare.toFixed(2)} (${TFL_API.isPeakTime(dateTime) ? 'Peak' : 'Off-Peak'})`);
+    } catch (error) {
+      console.error('Error calculating fare:', error);
+      priceInput.value = '3.40';
+    } finally {
+      isCalculatingFare = false;
+      loadingIndicator.classList.remove('active');
+    }
   }
   
   dateTimeInput.addEventListener('change', updatePrice);
   transportInput.addEventListener('change', updatePrice);
-  originInput.addEventListener('blur', updatePrice);
-  destinationInput.addEventListener('blur', updatePrice);
+  
+  let debounceTimer;
+  const debouncedUpdate = () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePrice, 500);
+  };
+  
+  originInput.addEventListener('blur', debouncedUpdate);
+  destinationInput.addEventListener('blur', debouncedUpdate);
 }
 
 function setupStationAutocomplete(inputId, suggestionsId) {
@@ -1183,15 +1504,25 @@ function setupStationAutocomplete(inputId, suggestionsId) {
   
   input.addEventListener('input', () => {
     const query = input.value.toLowerCase().trim();
+    const transport = document.getElementById('transportInput').value;
     
     if (query.length === 0) {
       suggestionsDiv.style.display = 'none';
       return;
     }
     
-    const matches = TFL_STATIONS.filter(station => 
-      station.name.toLowerCase().includes(query)
-    ).slice(0, 10);
+    let filteredStations;
+    if (transport === 'bus' || transport === 'tram') {
+      filteredStations = TFL_STATIONS.filter(station => 
+        station.lines.includes('bus') && station.name.toLowerCase().includes(query)
+      );
+    } else {
+      filteredStations = TFL_STATIONS.filter(station => 
+        !station.lines.includes('bus') && station.name.toLowerCase().includes(query)
+      );
+    }
+    
+    const matches = filteredStations.slice(0, 10);
     
     if (matches.length === 0) {
       suggestionsDiv.style.display = 'none';
@@ -1253,7 +1584,8 @@ function capitalizeLineName(line) {
     'elizabeth': 'Elizabeth',
     'overground': 'Overground',
     'dlr': 'DLR',
-    'tram': 'Tram'
+    'tram': 'Tram',
+    'bus': 'Bus'
   };
   return names[line] || line;
 }
@@ -1308,13 +1640,23 @@ function renderMonths() {
 function handleTransportChange() {
   const transport = document.getElementById('transportInput').value;
   const destinationGroup = document.getElementById('destinationGroup');
+  const originLabel = document.getElementById('originLabel');
+  const originInput = document.getElementById('originInput');
   
-  if (transport === 'bus') {
+  if (transport === 'bus' || transport === 'tram') {
     destinationGroup.style.display = 'none';
     document.getElementById('destinationInput').value = '';
+    originLabel.textContent = 'Bus Route';
+    originInput.placeholder = 'Select bus number';
   } else {
     destinationGroup.style.display = 'block';
+    originLabel.textContent = 'From';
+    originInput.placeholder = 'Origin station';
   }
+  
+  originInput.value = '';
+  document.getElementById('destinationInput').value = '';
+  document.getElementById('priceInput').value = '';
 }
 
 function addJourney() {
@@ -1329,17 +1671,15 @@ function addJourney() {
     return;
   }
   
-  // Split datetime-local value (format: YYYY-MM-DDTHH:MM)
   const [dateStr, timeStr] = dateTimeValue.split('T');
   const time = timeStr;
-
   
   if (!origin) {
-    alert('Please enter an origin station');
+    alert(transport === 'bus' || transport === 'tram' ? 'Please select a bus route' : 'Please enter an origin station');
     return;
   }
   
-  if (transport !== 'bus' && !destination) {
+  if (transport !== 'bus' && transport !== 'tram' && !destination) {
     alert('Please enter a destination station');
     return;
   }
@@ -1351,11 +1691,11 @@ function addJourney() {
   
   const journey = {
     id: Date.now().toString(),
-    date: dateStr, // Use the date from the datetime input
+    date: dateStr,
     time: time,
     transport: transport,
     origin: origin,
-    destination: transport === 'bus' ? null : destination,
+    destination: (transport === 'bus' || transport === 'tram') ? null : destination,
     price: price,
     month: activeMonth
   };
@@ -1363,11 +1703,10 @@ function addJourney() {
   journeys.push(journey);
   saveJourneys();
   
-    document.getElementById('originInput').value = '';
+  document.getElementById('originInput').value = '';
   document.getElementById('destinationInput').value = '';
   document.getElementById('priceInput').value = '';
   
-  // Reset to current date/time
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1377,7 +1716,6 @@ function addJourney() {
   document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
   
   updateAll();
-
   
   console.log('Journey added:', journey);
 }
@@ -1421,6 +1759,8 @@ function renderJourneys() {
   sortedDates.forEach(date => {
     const dateJourneys = groupedByDate[date];
     const dateTotal = dateJourneys.reduce((sum, j) => sum + j.price, 0);
+    const dailyCap = getDailyCap(dateJourneys);
+    const isCapped = dateTotal >= dailyCap;
     
     const dateGroup = document.createElement('div');
     dateGroup.className = 'journey-date-group';
@@ -1429,7 +1769,10 @@ function renderJourneys() {
     dateHeader.className = 'journey-date-header';
     dateHeader.innerHTML = `
       <span>${formatDate(date)}</span>
-      <span class="date-total">£${dateTotal.toFixed(2)}</span>
+      <span>
+        <span class="date-total">£${dateTotal.toFixed(2)}</span>
+        ${isCapped ? `<span class="date-capped">⚡ Capped at £${dailyCap.toFixed(2)}</span>` : ''}
+      </span>
     `;
     dateGroup.appendChild(dateHeader);
     
@@ -1533,25 +1876,57 @@ function updateSummary() {
   document.getElementById('currentMonthSpend').textContent = `£${totalSpend.toFixed(2)}`;
   document.getElementById('journeyCount').textContent = `${journeyCount} journey${journeyCount !== 1 ? 's' : ''}`;
   
+  // Monthly comparison with personalized Travelcard cost
   const comparisonCard = document.getElementById('comparisonCard');
+  const comparisonLabel = document.getElementById('comparisonLabel');
   const comparisonValue = document.getElementById('comparison');
   const comparisonText = document.getElementById('comparisonText');
+  
+  const zoneText = userHomeZone === 1 ? 'Zone 1' : `Zones 1-${userHomeZone}`;
+  comparisonLabel.textContent = `vs Monthly Card (${zoneText} - £${monthlyCardCost.toFixed(2)})`;
   
   if (totalSpend === 0) {
     comparisonCard.className = 'summary-card';
     comparisonValue.textContent = '-';
     comparisonText.textContent = 'Start tracking to compare';
   } else {
-    const difference = MONTHLY_CARD_COST - totalSpend;
+    const difference = monthlyCardCost - totalSpend;
     
     if (difference > 0) {
       comparisonCard.className = 'summary-card savings';
       comparisonValue.textContent = `£${difference.toFixed(2)}`;
-      comparisonText.textContent = 'Saved vs monthly card';
+      comparisonText.textContent = 'Saved with contactless';
     } else {
       comparisonCard.className = 'summary-card warning';
       comparisonValue.textContent = `£${Math.abs(difference).toFixed(2)}`;
-      comparisonText.textContent = 'Over monthly card cost';
+      comparisonText.textContent = 'Oyster card would save money';
+    }
+  }
+  
+  // Today's journeys and cap
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayJourneys = journeys.filter(j => j.date === todayStr);
+  const todayTotal = todayJourneys.reduce((sum, j) => sum + j.price, 0);
+  
+  const dailyCapCard = document.getElementById('dailyCapCard');
+  const todaySpendEl = document.getElementById('todaySpend');
+  const capStatusEl = document.getElementById('capStatus');
+  
+  todaySpendEl.textContent = `£${todayTotal.toFixed(2)}`;
+  
+  if (todayJourneys.length === 0) {
+    dailyCapCard.className = 'summary-card';
+    capStatusEl.textContent = 'No journeys today';
+  } else {
+    const dailyCap = getDailyCap(todayJourneys);
+    
+    if (todayTotal >= dailyCap) {
+      dailyCapCard.className = 'summary-card capped';
+      capStatusEl.textContent = `⚡ Daily cap reached (£${dailyCap.toFixed(2)})`;
+    } else {
+      dailyCapCard.className = 'summary-card';
+      const remaining = dailyCap - todayTotal;
+      capStatusEl.textContent = `£${remaining.toFixed(2)} until cap (£${dailyCap.toFixed(2)})`;
     }
   }
 }
@@ -1652,7 +2027,6 @@ function updateAll() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 </script>
-
 
 </body>
 </html>
