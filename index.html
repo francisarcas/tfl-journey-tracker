@@ -1239,7 +1239,7 @@ canvas {
       <div class="menu-content">
         <img id="userMenuAvatar" class="avatar" src="assets/person001.png" alt="User Avatar">
         <div class="user-info">
-          <div id="userMenuGreeting" class="greeting">Good day,</div>
+          <div id="userMenuGreeting" class="greeting"></div>
           <div id="userMenuUsername" class="username">TFL User</div>
         </div>
         <div class="logout-area">
@@ -1397,53 +1397,6 @@ canvas {
 // Global variables
 const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
-// Monthly Travelcard prices (28-day, Adult, 2026 rates)
-const MONTHLY_TRAVELCARD_PRICES = {
-  '1': 171.70,
-  '1-2': 171.70,
-  '1-3': 201.60,
-  '1-4': 246.60,
-  '1-5': 293.40,
-  '1-6': 313.40,
-  '1-7': 341.40,
-  '1-8': 402.90,
-  '1-9': 447.00,
-  '2': 128.70,
-  '2-3': 128.70,
-  '2-4': 142.50,
-  '2-5': 170.90,
-  '2-6': 214.70,
-  '3': 128.70,
-  '3-4': 128.70,
-  '3-5': 142.50,
-  '3-6': 170.90,
-  '4': 128.70,
-  '4-5': 128.70,
-  '4-6': 142.50,
-  '5': 128.70,
-  '5-6': 128.70,
-  '6': 128.70
-};
-
-// Daily caps for different zone combinations (2026 rates)
-const DAILY_CAPS = {
-  'bus': 5.25,
-  '1': 8.90,
-  '1-2': 8.90,
-  '1-3': 10.50,
-  '1-4': 12.80,
-  '1-5': 15.30,
-  '1-6': 16.30,
-  '1-7': 17.80,
-  '1-8': 21.00,
-  '1-9': 23.30,
-  '2': 8.90,
-  '2-3': 10.50,
-  '2-4': 12.80,
-  '2-5': 15.30,
-  '2-6': 16.30
-};
-
 const today = new Date();
 let activeYear = today.getFullYear();
 let activeMonth = `${activeYear}-${MONTHS[today.getMonth()]}`;
@@ -1453,9 +1406,30 @@ let isCalculatingFare = false;
 let userHomeZone = 4;
 let monthlyCardCost = 246.60;
 
+function getGreeting(userName) {
+    const hour = new Date().getHours();
+    let greetingPhrase;
+
+    if (hour >= 6 && hour < 12) {
+        greetingPhrase = "Good morning";
+    } else if (hour >= 12 && hour < 18) {
+        greetingPhrase = "Good afternoon";
+    } else if (hour >= 18 && hour < 24) {
+        greetingPhrase = "Good evening";
+    } else {
+        greetingPhrase = "Good night";
+    }
+    return `${greetingPhrase},`;
+}
+
 function initApp() {
   console.log('TFL Journey Tracker - Contactless vs Oyster Comparison Tool');
   console.log('Total stations loaded:', TFL_STATIONS.length);
+  
+  // Add this section to set the greeting
+  const userName = "TFL User"; // You can customize this or get it from localStorage
+  const greeting = getGreeting(userName);
+  document.getElementById('userMenuGreeting').textContent = greeting;
   
   loadUserSettings();
   
@@ -1482,6 +1456,7 @@ function initApp() {
   loadJourneys();
   updateAll();
 }
+
 
 function loadUserSettings() {
   const savedZone = localStorage.getItem('tfl_user_home_zone');
