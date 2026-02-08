@@ -38,7 +38,7 @@
   --jubilee: #A0A5A9;
   --metropolitan: #9B0056;
   --northern: #000000;
-  --northern-border: #ffffff;
+  --northern-border: #414141;
   --piccadilly: #003688;
   --victoria: #0098D4;
   --waterloo: #95CDBA;
@@ -757,51 +757,57 @@ button.disabled {
 
 .line-badge.northern {
   background: var(--northern);
-  border: 1px solid var(--northern-border);
+  border: 0.5px solid var(--northern-border);
 }
 
 .line-badge.victoria {
   background: var(--victoria);
+  border: 0.5px solid #333;
 }
 
 .line-badge.central {
   background: var(--central);
+  border: 0.5px solid #333;
 }
 
 .line-badge.piccadilly {
   background: var(--piccadilly);
+  border: 0.5px solid #333;
 }
 
 .line-badge.district {
   background: var(--district);
+  border: 0.5px solid #333;
 }
 
 .line-badge.circle {
   background: var(--circle);
-  border: 1px solid #333;
+  border: 0.5px solid #333;
 }
 
 .line-badge.metropolitan {
   background: var(--metropolitan);
+  border: 0.5px solid #333;
 }
 
 .line-badge.hammersmith {
   background: var(--hammersmith);
-  border: 1px solid #333;
+  border: 0.5px solid #333;
 }
 
 .line-badge.bakerloo {
   background: var(--bakerloo);
+  border: 0.5px solid #333;
 }
 
 .line-badge.jubilee {
   background: var(--jubilee);
-  border: 1px solid #333;
+  border: 0.5px solid #333;
 }
 
 .line-badge.waterloo {
   background: var(--waterloo);
-  border: 1px solid #333;
+  border: 0.5px solid #333;
 }
 
 .line-badge.elizabeth {
@@ -1108,32 +1114,37 @@ canvas {
     width: 36px;
   }
   
-  /* Fix journey item layout */
+  /* Fix journey item layout - time and icon stacked vertically */
   .journey-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto auto;
-    gap: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     padding: 12px 0;
   }
   
   .journey-left {
-    grid-column: 1 / 3;
-    grid-row: 1;
     display: flex;
     align-items: flex-start;
     gap: 12px;
     width: 100%;
-    margin-bottom: 0;
   }
   
+  /* Time and icon column - stacked vertically */
   .journey-time {
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     min-width: 50px;
+    flex-shrink: 0;
   }
   
   .journey-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
     flex-shrink: 0;
+    margin: 0;
   }
   
   .journey-details {
@@ -1146,19 +1157,24 @@ canvas {
     word-break: break-word;
   }
   
+  .journey-transport {
+    font-size: 0.75rem;
+  }
+  
+  /* Price and actions on same row, close together */
   .journey-right {
-    grid-column: 1 / 4;
-    grid-row: 2;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
+    gap: 12px;
     width: 100%;
-    padding-left: 62px; /* Align with journey details (50px time + 12px gap) */
+    padding-left: 62px; /* Align with journey details */
   }
   
   .journey-price {
     font-size: 1rem;
-    text-align: left;
+    text-align: right;
+    min-width: auto;
   }
   
   .journey-actions {
@@ -1191,6 +1207,7 @@ canvas {
     left: -155px;
   }
 }
+
 
 
 /* Scrollbar Styling */
