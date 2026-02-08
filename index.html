@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TFL Journey Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="station-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+:root {
+  --bg: #0e0e11;
+  --card: #1b1b20;
+  --text: #f5f5f7;
+  --muted: #9a9aa0;
+  --accent1: #0a84ff;
+  --accent2: #ff375f;
+  --danger: #b90900;
+  --danger-border: #ff453a;
+  --interactive-bg: #2a2a31;
+  --interactive-bg-hover: #3a3a41;
+  --white: #ffffff;
+  --shadow-light: rgba(0,0,0,0.2);
+  --shadow-medium: rgba(0,0,0,0.3);
+  --shadow-strong: rgba(0,0,0,0.25);
+  --avatar-border: rgba(255,255,255,0.2);
+  --disabled-bg: #555;
+  --success: #28a745;
+  --warning: #ffc107;
+  --tooltip-bg: #1b1b20cc;
+  --radius: 18px;
+  
+  /* TFL Line Colors */
+  --bakerloo: #B36305;
+  --central: #E32017;
+  --circle: #FFD300;
+  --district: #00782A;
+  --hammersmith: #F3A9BB;
+  --jubilee: #A0A5A9;
+  --metropolitan: #9B0056;
+  --northern: #000000;
+  --northern-border: #ffffff;
+  --piccadilly: #003688;
+  --victoria: #0098D4;
+  --waterloo: #95CDBA;
+  --elizabeth: #7156A5;
+  --overground: #EE7C0E;
+  --tram: #84B817;
+  --dlr: #00A4A7;
+  --bus: #DC241F;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 24px; /* Increased gap */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tfl-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* Top Bar & User Menu */
+.top-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  padding-right: 20px;
+  margin-bottom: 16px;
+}
+
+#user-menu {
+  z-index: 500;
+  height: 48px;
+  border-radius: 25px;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 4px 15px var(--shadow-strong);
+  transition: width 0.4s ease;
+  width: fit-content;
+  position: relative;
+}
+
+#userMenuToggle {
+  display: block;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 999;
+  margin: 0;
+  width: 180px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.menu-content {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  width: 180px;
+  min-width: 180px;
+  transition: width 0.4s ease;
+  background: var(--card);
+  color: var(--text);
+}
+
+#userMenuToggle:checked ~ .menu-content {
+  width: 220px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 12px 0 8px;
+  border: 2px solid var(--avatar-border);
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.greeting {
+  font-size: 0.84rem;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.1;
+}
+
+.username {
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-area {
+  width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--danger);
+  color: var(--text);
+  overflow: hidden;
+  transition: width 0.4s ease;
+  flex-shrink: 0;
+}
+
+#userMenuToggle:checked ~ .menu-content .logout-area {
+  width: 40px;
+}
+
+.logout-area:hover {
+  opacity: 0.85;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Summary Cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  margin-top: 8px; /* Added margin */
+}
+
+.summary-card {
+  background: var(--interactive-bg);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.summary-card .label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.summary-card .value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.summary-card .subtext {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.summary-card.savings {
+  position: relative;
+  background: #0000a0;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(0,0,0,0.4),
+    0 2px 8px rgba(0, 169, 224, 0.15);
+  max-height: 200px;
+  min-height: 120px; 
+}
+
+/* White curved band */
+.summary-card.savings::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 700px; 
+  height: 700px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: -320px; 
+  transform: translateY(-50%);
+}
+
+/* Main cyan curve */
+.summary-card.savings::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 700px;
+  height: 700px;
+  background: #00a9e0;
+  border-radius: 50%;
+  top: 50%;
+  /* Slightly more left than the white circle to create the band effect */
+  left: -350px; 
+  transform: translateY(-50%);
+}
+
+/* Content z-index fix */
+.summary-card.savings > * {
+  position: relative;
+  z-index: 1;
+}
+.summary-card.savings::before {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.summary-card.savings .label,
+.summary-card.savings .value,
+.summary-card.savings .subtext {
+  position: relative;
+  z-index: 1;
+  color: #000;
+}
+
+.summary-card.warning {
+  position: relative;
+  background: #e0a800; /* Deep amber base */
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(0,0,0,0.4),
+    0 2px 8px rgba(255, 193, 7, 0.15); /* Subtle amber glow */
+}
+
+/* White curved band */
+.summary-card.warning::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: -180px;
+  transform: translateY(-50%);
+  opacity: 0.2; /* Slightly more visible for contrast */
+}
+
+/* Main amber curve */
+.summary-card.warning::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+  background: #ffc107; /* Brighter amber */
+  border-radius: 50%;
+  top: 50%;
+  left: -200px;
+  transform: translateY(-50%);
+}
+
+/* Ensure content appears above curves */
+.summary-card.warning .label,
+.summary-card.warning .value,
+.summary-card.warning .subtext {
+  position: relative;
+  z-index: 1;
+  color: #000;
+}
+
+
+
+/* Month Tabs */
+.month-tabs, .year-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.year-tabs {
+  margin-bottom: 0;
+}
+
+.year-month-separator {
+  border-bottom: 1px solid #2a2a31;
+  margin: 8px 0 16px 0;
+}
+
+.month-tab, .year-tab {
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: #2a2a31;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.month-tab:hover, .year-tab:hover {
+  background: #3a3a41;
+}
+
+.month-tab.active, .year-tab.active {
+  background: var(--accent1);
+  font-weight: 600;
+  color: white;
+}
+
+/* Journey Form */
+.form {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr 1.2fr 1.2fr 0.7fr auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+  margin-left: 4px;
+}
+
+/* Date-time input styling */
+input[type="datetime-local"] {
+  background: #2a2a31;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  color: var(--text);
+  width: 100%;
+  font-size: 0.95rem;
+  height: 44px;
+  color-scheme: dark; /* Makes the calendar picker dark themed */
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Makes the calendar icon white */
+  cursor: pointer;
+}
+
+
+input, select {
+  background: #2a2a31;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  color: var(--text);
+  width: 100%;
+  font-size: 0.95rem;
+  height: 44px; /* Fixed height for consistency */
+}
+
+input:focus, select:focus {
+  outline: 2px solid var(--accent1);
+  outline-offset: 2px;
+}
+
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  background: var(--accent1);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s ease;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  opacity: 0.85;
+}
+
+button.disabled {
+  background-color: var(--disabled-bg) !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Station Input with Autocomplete */
+.station-input-wrapper {
+  position: relative;
+}
+
+.station-suggestions {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: auto;
+  background: var(--card);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+  min-width: 350px; /* Wider dropdown */
+}
+
+.station-suggestion-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #2a2a31;
+  white-space: nowrap; /* Keep everything on one line */
+}
+
+.station-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.station-suggestion-item:hover {
+  background: #2a2a31;
+}
+
+.station-name {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.line-indicators {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.line-badge {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.line-badge.northern {
+  background: var(--northern);
+  border: 1px solid var(--northern-border);
+}
+
+.line-badge.victoria {
+  background: var(--victoria);
+}
+
+.line-badge.central {
+  background: var(--central);
+}
+
+.line-badge.piccadilly {
+  background: var(--piccadilly);
+}
+
+.line-badge.district {
+  background: var(--district);
+}
+
+.line-badge.circle {
+  background: var(--circle);
+  border: 1px solid #333;
+}
+
+.line-badge.metropolitan {
+  background: var(--metropolitan);
+}
+
+.line-badge.hammersmith {
+  background: var(--hammersmith);
+  border: 1px solid #333;
+}
+
+.line-badge.bakerloo {
+  background: var(--bakerloo);
+}
+
+.line-badge.jubilee {
+  background: var(--jubilee);
+  border: 1px solid #333;
+}
+
+.line-badge.waterloo {
+  background: var(--waterloo);
+  border: 1px solid #333;
+}
+
+.line-badge.elizabeth {
+  background: var(--elizabeth);
+}
+
+.line-badge.overground {
+  background: var(--overground);
+}
+
+.line-badge.dlr {
+  background: var(--dlr);
+}
+
+/* Journey List */
+.journey-date-group {
+  margin-bottom: 20px;
+}
+
+.journey-date-header {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #2a2a31;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-total {
+  font-size: 0.85rem;
+  color: var(--accent1);
+}
+
+.journey-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #2a2a31;
+}
+
+.journey-item:last-child {
+  border-bottom: none;
+}
+
+.journey-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.journey-time {
+  font-size: 0.85rem;
+  color: var(--muted);
+  min-width: 50px;
+}
+
+.journey-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  color: white;
+}
+
+.journey-icon.underground {
+  background: var(--central);
+}
+
+.journey-icon.overground {
+  background: var(--overground);
+}
+
+.journey-icon.elizabeth {
+  background: var(--elizabeth);
+}
+
+.journey-icon.tram {
+  background: var(--tram);
+}
+
+.journey-icon.bus {
+  background: var(--bus);
+}
+
+.journey-icon.dlr {
+  background: var(--dlr);
+}
+
+.journey-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.journey-route {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.journey-route .arrow {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.journey-transport {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.journey-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.journey-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 60px;
+  text-align: right;
+}
+
+.journey-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.station-with-lines {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.station-with-lines .line-indicators {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.action {
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.action:hover {
+  color: var(--text);
+}
+
+.action.delete {
+  color: var(--danger);
+}
+
+.action.delete:hover {
+  color: var(--danger-border);
+}
+
+/* Chart */
+.chart-wrapper {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+canvas {
+  max-height: 200px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--muted);
+}
+
+.footer-link {
+  color: var(--muted);
+  text-decoration: none;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--text);
+}
+
+.footer-icon {
+  font-size: 1.5em;
+  padding: 0 5px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .top-bar-container {
+    justify-content: center;
+    padding-top: 10px;
+  }
+  
+  #user-menu {
+    height: 40px;
+    border-radius: 20px;
+  }
+  
+  .menu-content {
+    height: 40px;
+    min-width: 160px;
+    max-width: 170px;
+  }
+  
+  #userMenuToggle:checked ~ .menu-content {
+    max-width: 190px;
+  }
+  
+  .avatar {
+    width: 30px;
+    height: 30px;
+    margin: 0 8px 0 6px;
+  }
+  
+  .greeting {
+    font-size: 0.75rem;
+  }
+  
+  .username {
+    font-size: 0.9rem;
+  }
+  
+  .logout-area {
+    width: 0;
+  }
+  
+  #userMenuToggle:checked ~ .menu-content .logout-area {
+    width: 36px;
+  }
+  
+  .journey-item {
+    flex-wrap: wrap;
+  }
+  
+  .journey-left {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .journey-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .journey-date-header {
+    font-size: 0.85rem;
+  }
+  
+  .date-total {
+    font-size: 0.8rem;
+  }
+  .summary-card.savings::before,
+  .summary-card.warning::before {
+    width: 300px;
+    height: 300px;
+    left: -140px;
+  }
+  
+  .summary-card.savings::after,
+  .summary-card.warning::after {
+    width: 300px;
+    height: 300px;
+    left: -155px;
+  }
+}
+
+/* Scrollbar Styling */
+.station-suggestions::-webkit-scrollbar {
+  width: 8px;
+}
+
+.station-suggestions::-webkit-scrollbar-track {
+  background: var(--card);
+}
+
+.station-suggestions::-webkit-scrollbar-thumb {
+  background: var(--interactive-bg);
+  border-radius: 4px;
+}
+
+.station-suggestions::-webkit-scrollbar-thumb:hover {
+  background: var(--interactive-bg-hover);
+}
+</style>
+</head>
+<body>
+
+<div id="appContentWrapper" class="container">
+  <!-- User Menu -->
+  <div class="top-bar-container">
+    <div id="user-menu">
+      <input type="checkbox" id="userMenuToggle" />
+      <div class="menu-content">
+        <img id="userMenuAvatar" class="avatar" src="assets/person001.png" alt="User Avatar">
+        <div class="user-info">
+          <div id="userMenuGreeting" class="greeting">Good day,</div>
+          <div id="userMenuUsername" class="username">TFL User</div>
+        </div>
+        <div class="logout-area">
+          <button class="logout-btn" onclick="alert('Logout functionality will be added later')">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h1>
+  <img src="assets/logos/tfl.png" alt="TFL" class="tfl-logo">
+  TFL Journey Tracker
+</h1>
+
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">This Month</div>
+      <div class="value" id="currentMonthSpend">£0.00</div>
+      <div class="subtext" id="journeyCount">0 journeys</div>
+    </div>
+    <div class="summary-card" id="comparisonCard">
+      <div class="label">vs Monthly Card (£164.70)</div>
+      <div class="value" id="comparison">-</div>
+      <div class="subtext" id="comparisonText">Start tracking to compare</div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="chart-wrapper">
+      <canvas id="spendingChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Month/Year Selector -->
+  <div class="card">
+    <div class="year-tabs" id="yearTabs"></div>
+    <div class="year-month-separator"></div>
+    <div class="month-tabs" id="monthTabs"></div>
+  </div>
+
+  <!-- Journey Input Form -->
+  <div class="card">
+    <div class="form">
+      <div class="form-group">
+        <label>Date & Time</label>
+        <input id="dateTimeInput" type="datetime-local" required>
+      </div>
+      <div class="form-group">
+        <label>Transport</label>
+        <select id="transportInput">
+          <option value="underground">Underground</option>
+          <option value="overground">Overground</option>
+          <option value="elizabeth">Elizabeth Line</option>
+          <option value="tram">Tram</option>
+          <option value="bus">Bus</option>
+          <option value="dlr">DLR</option>
+        </select>
+      </div>
+      <div class="form-group station-input-wrapper">
+        <label>From</label>
+        <input id="originInput" type="text" placeholder="Origin station" autocomplete="off">
+        <div id="originSuggestions" class="station-suggestions"></div>
+      </div>
+      <div class="form-group station-input-wrapper" id="destinationGroup">
+        <label>To</label>
+        <input id="destinationInput" type="text" placeholder="Destination station" autocomplete="off">
+        <div id="destinationSuggestions" class="station-suggestions"></div>
+      </div>
+      <div class="form-group">
+        <label>Price</label>
+        <input id="priceInput" type="number" step="0.01" placeholder="£" required>
+      </div>
+      <button onclick="addJourney()" style="margin-top: 18px;">
+        <i class="fa-solid fa-plus"></i> Add
+      </button>
+    </div>
+  </div>
+
+  <!-- Journey List -->
+  <div class="card">
+    <div id="journeyList">
+      <div class="empty-state">
+        <i class="fa-solid fa-train-subway"></i>
+        <h3>No journeys yet</h3>
+        <p>Add your first journey above to start tracking</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <a href="https://www.linkedin.com/in/francisarcas/" target="_blank" class="footer-link" title="Francis Arcas LinkedIn">
+    <i class="fa-brands fa-linkedin footer-icon"></i>
+  </a>
+  <span style="margin: 0 10px;">|</span>
+  <a href="https://github.com/francisarcas/tfl-tracker" target="_blank" class="footer-link" title="TFL Tracker GitHub">
+    <i class="fa-brands fa-github footer-icon"></i>
+  </a>
+</div>
+
+<script>
+// Global variables
+const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const MONTHLY_CARD_COST = 171.70;
+
+const today = new Date();
+let activeYear = today.getFullYear();
+let activeMonth = `${activeYear}-${MONTHS[today.getMonth()]}`;
+
+let journeys = [];
+
+// TFL Fare Data (2026 prices)
+const FARE_DATA = {
+  single: {
+    '1-1': { peak: 3.10, offPeak: 3.00 },
+    '1-2': { peak: 3.60, offPeak: 3.10 },
+    '1-3': { peak: 4.20, offPeak: 3.50 },
+    '1-4': { peak: 4.80, offPeak: 3.80 },
+    '1-5': { peak: 5.40, offPeak: 3.80 },
+    '1-6': { peak: 5.90, offPeak: 4.20 },
+    '2-2': { peak: 2.10, offPeak: 1.90 },
+    '2-3': { peak: 2.50, offPeak: 2.10 },
+    '2-4': { peak: 2.80, offPeak: 2.30 },
+    '2-5': { peak: 3.20, offPeak: 2.50 },
+    '2-6': { peak: 3.50, offPeak: 2.70 },
+    '3-3': { peak: 2.10, offPeak: 1.90 },
+    '3-4': { peak: 2.40, offPeak: 2.00 },
+    '3-5': { peak: 2.70, offPeak: 2.20 },
+    '3-6': { peak: 3.00, offPeak: 2.40 },
+    '4-4': { peak: 2.10, offPeak: 1.90 },
+    '4-5': { peak: 2.40, offPeak: 2.00 },
+    '4-6': { peak: 2.70, offPeak: 2.20 },
+    '5-5': { peak: 2.10, offPeak: 1.90 },
+    '5-6': { peak: 2.40, offPeak: 2.00 },
+    '6-6': { peak: 2.10, offPeak: 1.90 }
+  },
+  bus: 1.75,
+  tram: 1.75
+};
+
+// Helper functions
+function isPeakTime(timeString) {
+  if (!timeString) return true;
+  
+  const [hours, minutes] = timeString.split(':').map(Number);
+  const totalMinutes = hours * 60 + minutes;
+  
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  
+  if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+  
+  const morningPeakStart = 6 * 60 + 30;
+  const morningPeakEnd = 9 * 60 + 30;
+  const eveningPeakStart = 16 * 60;
+  const eveningPeakEnd = 19 * 60;
+  
+  return (totalMinutes >= morningPeakStart && totalMinutes <= morningPeakEnd) ||
+         (totalMinutes >= eveningPeakStart && totalMinutes <= eveningPeakEnd);
+}
+
+function getStationZones(stationName) {
+  return STATION_ZONES[stationName] || [1];
+}
+
+function calculateFare(transport, origin, destination, time) {
+  if (transport === 'bus' || transport === 'tram') {
+    return FARE_DATA.bus;
+  }
+  
+  const originZones = getStationZones(origin);
+  const destinationZones = destination ? getStationZones(destination) : originZones;
+  
+  const minOriginZone = Math.min(...originZones);
+  const maxDestZone = destination ? Math.max(...destinationZones) : minOriginZone;
+  
+  const zoneKey = `${minOriginZone}-${maxDestZone}`;
+  
+  if (FARE_DATA.single[zoneKey]) {
+    const isPeak = isPeakTime(time);
+    return isPeak ? FARE_DATA.single[zoneKey].peak : FARE_DATA.single[zoneKey].offPeak;
+  }
+  
+  const zoneDiff = maxDestZone - minOriginZone;
+  return 3.00 + (zoneDiff * 0.50);
+}
+
+function initApp() {
+  console.log('TFL Journey Tracker - Development Mode');
+  console.log('Total stations loaded:', TFL_STATIONS.length);
+  
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+  
+  renderYears();
+  renderMonths();
+  initChart();
+  
+  document.getElementById('transportInput').addEventListener('change', handleTransportChange);
+  
+  setupStationAutocomplete('originInput', 'originSuggestions');
+  setupStationAutocomplete('destinationInput', 'destinationSuggestions');
+  setupAutoPriceCalculation();
+  
+  loadJourneys();
+  updateAll();
+}
+
+function setupAutoPriceCalculation() {
+  const dateTimeInput = document.getElementById('dateTimeInput');
+  const transportInput = document.getElementById('transportInput');
+  const originInput = document.getElementById('originInput');
+  const destinationInput = document.getElementById('destinationInput');
+  const priceInput = document.getElementById('priceInput');
+  
+  function updatePrice() {
+    const transport = transportInput.value;
+    const origin = originInput.value.trim();
+    const destination = destinationInput.value.trim();
+    const dateTime = dateTimeInput.value;
+    
+    if (!dateTime) return;
+    
+    const time = dateTime.split('T')[1];
+
+    if (!origin) return;
+    if (transport !== 'bus' && !destination) return;
+    
+    const calculatedFare = calculateFare(transport, origin, destination, time);
+    priceInput.value = calculatedFare.toFixed(2);
+  }
+  
+  dateTimeInput.addEventListener('change', updatePrice);
+  transportInput.addEventListener('change', updatePrice);
+  originInput.addEventListener('blur', updatePrice);
+  destinationInput.addEventListener('blur', updatePrice);
+}
+
+function setupStationAutocomplete(inputId, suggestionsId) {
+  const input = document.getElementById(inputId);
+  const suggestionsDiv = document.getElementById(suggestionsId);
+  
+  input.addEventListener('input', () => {
+    const query = input.value.toLowerCase().trim();
+    
+    if (query.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    const matches = TFL_STATIONS.filter(station => 
+      station.name.toLowerCase().includes(query)
+    ).slice(0, 10);
+    
+    if (matches.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    suggestionsDiv.innerHTML = '';
+    matches.forEach(station => {
+      const item = document.createElement('div');
+      item.className = 'station-suggestion-item';
+      
+      const lineBadges = station.lines.map(line => 
+        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+      ).join('');
+      
+      item.innerHTML = `
+        <span class="station-name">${station.name}</span>
+        <div class="line-indicators">${lineBadges}</div>
+      `;
+      
+      item.onclick = () => {
+        input.value = station.name;
+        suggestionsDiv.style.display = 'none';
+        input.dispatchEvent(new Event('blur'));
+      };
+      
+      suggestionsDiv.appendChild(item);
+    });
+    
+    suggestionsDiv.style.display = 'block';
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.style.display = 'none';
+    }
+  });
+  
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length > 0) {
+      input.dispatchEvent(new Event('input'));
+    }
+  });
+}
+
+function capitalizeLineName(line) {
+  const names = {
+    'northern': 'Northern',
+    'victoria': 'Victoria',
+    'central': 'Central',
+    'piccadilly': 'Piccadilly',
+    'district': 'District',
+    'circle': 'Circle',
+    'metropolitan': 'Metropolitan',
+    'hammersmith': 'Hammersmith & City',
+    'bakerloo': 'Bakerloo',
+    'jubilee': 'Jubilee',
+    'waterloo': 'Waterloo & City',
+    'elizabeth': 'Elizabeth',
+    'overground': 'Overground',
+    'dlr': 'DLR',
+    'tram': 'Tram'
+  };
+  return names[line] || line;
+}
+
+function getStationData(stationName) {
+  return TFL_STATIONS.find(s => s.name === stationName);
+}
+
+function renderYears() {
+  const yearTabsDiv = document.getElementById('yearTabs');
+  yearTabsDiv.innerHTML = '';
+  
+  const years = new Set([activeYear]);
+  journeys.forEach(j => {
+    const year = parseInt(j.date.substring(0, 4));
+    years.add(year);
+  });
+  
+  [...years].sort().forEach(year => {
+    const tab = document.createElement('div');
+    tab.className = 'year-tab';
+    if (year === activeYear) tab.classList.add('active');
+    tab.textContent = year;
+    tab.onclick = () => {
+      activeYear = year;
+      const currentMonthAbbr = activeMonth.substring(5, 8);
+      activeMonth = `${activeYear}-${currentMonthAbbr}`;
+      updateAll();
+    };
+    yearTabsDiv.appendChild(tab);
+  });
+}
+
+function renderMonths() {
+  const monthTabsDiv = document.getElementById('monthTabs');
+  monthTabsDiv.innerHTML = '';
+  
+  MONTHS.forEach((month, index) => {
+    const monthKey = `${activeYear}-${month}`;
+    const tab = document.createElement('div');
+    tab.className = 'month-tab';
+    if (monthKey === activeMonth) tab.classList.add('active');
+    tab.textContent = month;
+    tab.onclick = () => {
+      activeMonth = monthKey;
+      updateAll();
+    };
+    monthTabsDiv.appendChild(tab);
+  });
+}
+
+function handleTransportChange() {
+  const transport = document.getElementById('transportInput').value;
+  const destinationGroup = document.getElementById('destinationGroup');
+  
+  if (transport === 'bus') {
+    destinationGroup.style.display = 'none';
+    document.getElementById('destinationInput').value = '';
+  } else {
+    destinationGroup.style.display = 'block';
+  }
+}
+
+function addJourney() {
+  const dateTimeValue = document.getElementById('dateTimeInput').value;
+  const transport = document.getElementById('transportInput').value;
+  const origin = document.getElementById('originInput').value.trim();
+  const destination = document.getElementById('destinationInput').value.trim();
+  const price = parseFloat(document.getElementById('priceInput').value);
+  
+  if (!dateTimeValue) {
+    alert('Please enter a date and time');
+    return;
+  }
+  
+  // Split datetime-local value (format: YYYY-MM-DDTHH:MM)
+  const [dateStr, timeStr] = dateTimeValue.split('T');
+  const time = timeStr;
+
+  
+  if (!origin) {
+    alert('Please enter an origin station');
+    return;
+  }
+  
+  if (transport !== 'bus' && !destination) {
+    alert('Please enter a destination station');
+    return;
+  }
+  
+  if (!price || price <= 0) {
+    alert('Please enter a valid price');
+    return;
+  }
+  
+  const journey = {
+    id: Date.now().toString(),
+    date: dateStr, // Use the date from the datetime input
+    time: time,
+    transport: transport,
+    origin: origin,
+    destination: transport === 'bus' ? null : destination,
+    price: price,
+    month: activeMonth
+  };
+  
+  journeys.push(journey);
+  saveJourneys();
+  
+    document.getElementById('originInput').value = '';
+  document.getElementById('destinationInput').value = '';
+  document.getElementById('priceInput').value = '';
+  
+  // Reset to current date/time
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+  
+  updateAll();
+
+  
+  console.log('Journey added:', journey);
+}
+
+function deleteJourney(id) {
+  if (!confirm('Delete this journey?')) return;
+  
+  journeys = journeys.filter(j => j.id !== id);
+  saveJourneys();
+  updateAll();
+}
+
+function renderJourneys() {
+  const journeyListDiv = document.getElementById('journeyList');
+  
+  const monthJourneys = journeys.filter(j => j.month === activeMonth);
+  
+  if (monthJourneys.length === 0) {
+    journeyListDiv.innerHTML = `
+      <div class="empty-state">
+        <i class="fa-solid fa-train-subway"></i>
+        <h3>No journeys this month</h3>
+        <p>Add your first journey above to start tracking</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const groupedByDate = {};
+  monthJourneys.forEach(j => {
+    if (!groupedByDate[j.date]) {
+      groupedByDate[j.date] = [];
+    }
+    groupedByDate[j.date].push(j);
+  });
+  
+  const sortedDates = Object.keys(groupedByDate).sort().reverse();
+  
+  journeyListDiv.innerHTML = '';
+  
+  sortedDates.forEach(date => {
+    const dateJourneys = groupedByDate[date];
+    const dateTotal = dateJourneys.reduce((sum, j) => sum + j.price, 0);
+    
+    const dateGroup = document.createElement('div');
+    dateGroup.className = 'journey-date-group';
+    
+    const dateHeader = document.createElement('div');
+    dateHeader.className = 'journey-date-header';
+    dateHeader.innerHTML = `
+      <span>${formatDate(date)}</span>
+      <span class="date-total">£${dateTotal.toFixed(2)}</span>
+    `;
+    dateGroup.appendChild(dateHeader);
+    
+    dateJourneys.sort((a, b) => a.time.localeCompare(b.time));
+    
+    dateJourneys.forEach(journey => {
+      const item = document.createElement('div');
+      item.className = 'journey-item';
+      
+      const originStation = getStationData(journey.origin);
+      const destinationStation = journey.destination ? getStationData(journey.destination) : null;
+      
+      const originBadges = originStation ? originStation.lines.map(line => 
+        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+      ).join('') : '';
+      
+      const destinationBadges = destinationStation ? destinationStation.lines.map(line => 
+        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+      ).join('') : '';
+      
+      const route = journey.destination 
+        ? `
+          <span class="station-with-lines">
+            ${journey.origin}
+            <span class="line-indicators">${originBadges}</span>
+          </span>
+          <span class="arrow">→</span>
+          <span class="station-with-lines">
+            ${journey.destination}
+            <span class="line-indicators">${destinationBadges}</span>
+          </span>
+        `
+        : `
+          <span class="station-with-lines">
+            ${journey.origin}
+            <span class="line-indicators">${originBadges}</span>
+          </span>
+        `;
+      
+      item.innerHTML = `
+        <div class="journey-left">
+          <div class="journey-time">${journey.time}</div>
+          <div class="journey-icon ${journey.transport}">
+            ${getTransportIcon(journey.transport)}
+          </div>
+          <div class="journey-details">
+            <div class="journey-route">${route}</div>
+            <div class="journey-transport">${capitalizeLineName(journey.transport)}</div>
+          </div>
+        </div>
+        <div class="journey-right">
+          <div class="journey-price">£${journey.price.toFixed(2)}</div>
+          <div class="journey-actions">
+            <span class="action delete" onclick="deleteJourney('${journey.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </span>
+          </div>
+        </div>
+      `;
+      
+      dateGroup.appendChild(item);
+    });
+    
+    journeyListDiv.appendChild(dateGroup);
+  });
+}
+
+function getTransportIcon(transport) {
+  const icons = {
+    underground: '<i class="fa-solid fa-train-subway"></i>',
+    overground: '<i class="fa-solid fa-train"></i>',
+    elizabeth: '<i class="fa-solid fa-train-tram"></i>',
+    tram: '<i class="fa-solid fa-train-tram"></i>',
+    bus: '<i class="fa-solid fa-bus"></i>',
+    dlr: '<i class="fa-solid fa-train"></i>'
+  };
+  return icons[transport] || '<i class="fa-solid fa-train"></i>';
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString + 'T00:00:00');
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  if (date.toDateString() === today.toDateString()) {
+    return 'Today';
+  } else if (date.toDateString() === yesterday.toDateString()) {
+    return 'Yesterday';
+  } else {
+    const options = { weekday: 'short', day: 'numeric', month: 'short' };
+    return date.toLocaleDateString('en-GB', options);
+  }
+}
+
+function updateSummary() {
+  const monthJourneys = journeys.filter(j => j.month === activeMonth);
+  const totalSpend = monthJourneys.reduce((sum, j) => sum + j.price, 0);
+  const journeyCount = monthJourneys.length;
+  
+  document.getElementById('currentMonthSpend').textContent = `£${totalSpend.toFixed(2)}`;
+  document.getElementById('journeyCount').textContent = `${journeyCount} journey${journeyCount !== 1 ? 's' : ''}`;
+  
+  const comparisonCard = document.getElementById('comparisonCard');
+  const comparisonValue = document.getElementById('comparison');
+  const comparisonText = document.getElementById('comparisonText');
+  
+  if (totalSpend === 0) {
+    comparisonCard.className = 'summary-card';
+    comparisonValue.textContent = '-';
+    comparisonText.textContent = 'Start tracking to compare';
+  } else {
+    const difference = MONTHLY_CARD_COST - totalSpend;
+    
+    if (difference > 0) {
+      comparisonCard.className = 'summary-card savings';
+      comparisonValue.textContent = `£${difference.toFixed(2)}`;
+      comparisonText.textContent = 'Saved vs monthly card';
+    } else {
+      comparisonCard.className = 'summary-card warning';
+      comparisonValue.textContent = `£${Math.abs(difference).toFixed(2)}`;
+      comparisonText.textContent = 'Over monthly card cost';
+    }
+  }
+}
+
+let spendingChart;
+
+function initChart() {
+  const ctx = document.getElementById('spendingChart');
+  spendingChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: MONTHS,
+      datasets: [{
+        label: 'Monthly Spend',
+        data: new Array(12).fill(0),
+        backgroundColor: '#0a84ff',
+        borderRadius: 8,
+        barPercentage: 0.7
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return '£' + context.parsed.y.toFixed(2);
+            }
+          },
+          backgroundColor: 'var(--tooltip-bg)',
+          titleColor: 'white',
+          bodyColor: 'white'
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#f5f5f7'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: '#2a2a31'
+          },
+          ticks: {
+            color: '#f5f5f7',
+            callback: function(value) {
+              return '£' + value;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateChart() {
+  const yearJourneys = journeys.filter(j => j.date.startsWith(activeYear.toString()));
+  const monthlyData = new Array(12).fill(0);
+  
+  yearJourneys.forEach(j => {
+    const monthIndex = MONTHS.indexOf(j.month.split('-')[1]);
+    if (monthIndex !== -1) {
+      monthlyData[monthIndex] += j.price;
+    }
+  });
+  
+  spendingChart.data.datasets[0].data = monthlyData;
+  spendingChart.update();
+}
+
+function saveJourneys() {
+  localStorage.setItem('tfl_journeys', JSON.stringify(journeys));
+}
+
+function loadJourneys() {
+  const saved = localStorage.getItem('tfl_journeys');
+  if (saved) {
+    journeys = JSON.parse(saved);
+  }
+}
+
+function updateAll() {
+  renderYears();
+  renderMonths();
+  renderJourneys();
+  updateSummary();
+  updateChart();
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+
+</body>
+</html>
