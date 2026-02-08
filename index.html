@@ -18,19 +18,14 @@
   --text: #f5f5f7;
   --muted: #9a9aa0;
   --accent1: #0a84ff;
-  --accent2: #ff375f;
   --danger: #b90900;
   --danger-border: #ff453a;
   --interactive-bg: #2a2a31;
   --interactive-bg-hover: #3a3a41;
-  --white: #ffffff;
-  --shadow-light: rgba(0,0,0,0.2);
-  --shadow-medium: rgba(0,0,0,0.3);
   --shadow-strong: rgba(0,0,0,0.25);
   --avatar-border: rgba(255,255,255,0.2);
   --disabled-bg: #555;
   --success: #28a745;
-  --warning: #ffc107;
   --tooltip-bg: #1b1b20cc;
   --radius: 18px;
   
@@ -381,50 +376,97 @@ h1 {
   margin-top: 4px;
 }
 
-.summary-card.savings {
-  position: relative;
+/* TFL Blue styling for "This Month" card */
+.summary-card.monthly-spend {
+   position: relative;
   background: #0000a0;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
-    0 2px 8px rgba(0, 169, 224, 0.15);
-  max-height: 200px;
-  min-height: 120px; 
+    0 2px 8px rgba(40, 167, 69, 0.15);
+}
+
+/* White curved band */
+.summary-card.monthly-spend::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 390px;
+  height: 390px;
+  background: white;
+  border-radius: 50%;
+  top: 50%;
+  left: -140px;
+  transform: translateY(-50%);
+  opacity: 1;
+}
+
+
+/* Main cyan curve */
+.summary-card.monthly-spend::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+  background: #00a9e0;
+  border-radius: 50%;
+  top: 50%;
+  left: -160px;
+  transform: translateY(-50%);
+}
+
+
+
+/* Content z-index fix */
+.summary-card.monthly-spend > * {
+  position: relative;
+  z-index: 3;
+}
+
+.summary-card.monthly-spend .label,
+.summary-card.monthly-spend .value,
+.summary-card.monthly-spend .subtext {
+  position: relative;
+  z-index: 3;
+  color: #000;
+}
+
+/* Comparison card - savings (green) */
+.summary-card.savings {
+  position: relative;
+  background: #28a745;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 16px rgba(0,0,0,0.4),
+    0 2px 8px rgba(40, 167, 69, 0.15);
 }
 
 .summary-card.savings::before {
   content: "";
   position: absolute;
   z-index: 0;
-  width: 700px; 
-  height: 700px;
+  width: 400px;
+  height: 400px;
   background: white;
   border-radius: 50%;
   top: 50%;
-  left: -320px; 
+  left: -140px;
   transform: translateY(-50%);
+  opacity: 0.2;
 }
 
 .summary-card.savings::after {
   content: "";
   position: absolute;
   z-index: 0;
-  width: 700px;
-  height: 700px;
-  background: #00a9e0;
+  width: 400px;
+  height: 400px;
+  background: #4caf50;
   border-radius: 50%;
   top: 50%;
-  left: -350px; 
+  left: -160px;
   transform: translateY(-50%);
-}
-
-.summary-card.savings > * {
-  position: relative;
-  z-index: 1;
-}
-
-.summary-card.savings::before {
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 .summary-card.savings .label,
@@ -435,6 +477,7 @@ h1 {
   color: #000;
 }
 
+/* Comparison card - warning (amber) */
 .summary-card.warning {
   position: relative;
   background: #e0a800;
@@ -444,6 +487,7 @@ h1 {
     0 2px 8px rgba(255, 193, 7, 0.15);
 }
 
+/* White curved band */
 .summary-card.warning::before {
   content: "";
   position: absolute;
@@ -453,11 +497,12 @@ h1 {
   background: white;
   border-radius: 50%;
   top: 50%;
-  left: -180px;
+  left: -140px;
   transform: translateY(-50%);
   opacity: 0.2;
 }
 
+/* Main amber curve */
 .summary-card.warning::after {
   content: "";
   position: absolute;
@@ -467,10 +512,11 @@ h1 {
   background: #ffc107;
   border-radius: 50%;
   top: 50%;
-  left: -200px;
+  left: -160px;
   transform: translateY(-50%);
 }
 
+/* Ensure content appears above curves */
 .summary-card.warning .label,
 .summary-card.warning .value,
 .summary-card.warning .subtext {
@@ -479,6 +525,7 @@ h1 {
   color: #000;
 }
 
+/* Daily cap card - capped (green) */
 .summary-card.capped {
   position: relative;
   background: #28a745;
@@ -522,6 +569,7 @@ h1 {
   z-index: 1;
   color: #000;
 }
+
 
 /* Month Tabs */
 .month-tabs, .year-tabs {
@@ -1069,6 +1117,7 @@ canvas {
     font-size: 0.8rem;
   }
   
+  .summary-card.monthly-spend::before,
   .summary-card.savings::before,
   .summary-card.warning::before,
   .summary-card.capped::before {
@@ -1077,6 +1126,7 @@ canvas {
     left: -140px;
   }
   
+  .summary-card.monthly-spend::after,
   .summary-card.savings::after,
   .summary-card.warning::after,
   .summary-card.capped::after {
@@ -1138,7 +1188,7 @@ canvas {
 
   <!-- Summary Cards -->
   <div class="summary-grid">
-    <div class="summary-card">
+    <div class="summary-card monthly-spend">
       <div class="label">This Month</div>
       <div class="value" id="currentMonthSpend">£0.00</div>
       <div class="subtext" id="journeyCount">0 journeys</div>
@@ -1326,14 +1376,13 @@ let activeMonth = `${activeYear}-${MONTHS[today.getMonth()]}`;
 
 let journeys = [];
 let isCalculatingFare = false;
-let userHomeZone = 4; // Default to Zone 4
-let monthlyCardCost = 246.60; // Default for Zone 1-4
+let userHomeZone = 4;
+let monthlyCardCost = 246.60;
 
 function initApp() {
   console.log('TFL Journey Tracker - Contactless vs Oyster Comparison Tool');
   console.log('Total stations loaded:', TFL_STATIONS.length);
   
-  // Load user settings
   loadUserSettings();
   
   const now = new Date();
@@ -1354,7 +1403,6 @@ function initApp() {
   setupStationAutocomplete('destinationInput', 'destinationSuggestions');
   setupAutoPriceCalculation();
   
-  // Update travelcard cost display in settings
   updateTravelcardCostDisplay();
   
   loadJourneys();
@@ -1374,7 +1422,6 @@ function saveUserSettings() {
 }
 
 function getMonthlyCardCost(homeZone) {
-  // Always calculate from zone 1 to home zone for comparison
   const zoneKey = homeZone === 1 ? '1' : `1-${homeZone}`;
   return MONTHLY_TRAVELCARD_PRICES[zoneKey] || 246.60;
 }
@@ -1402,7 +1449,6 @@ function saveSettings() {
   closeSettings();
   updateAll();
   
-  // Show confirmation
   const btn = document.querySelector('.save-settings-btn');
   const originalText = btn.innerHTML;
   btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
@@ -1411,7 +1457,6 @@ function saveSettings() {
   }, 2000);
 }
 
-// Update zone selector when changed
 document.addEventListener('DOMContentLoaded', () => {
   const homeZoneSelect = document.getElementById('homeZoneSelect');
   if (homeZoneSelect) {
@@ -1876,7 +1921,6 @@ function updateSummary() {
   document.getElementById('currentMonthSpend').textContent = `£${totalSpend.toFixed(2)}`;
   document.getElementById('journeyCount').textContent = `${journeyCount} journey${journeyCount !== 1 ? 's' : ''}`;
   
-  // Monthly comparison with personalized Travelcard cost
   const comparisonCard = document.getElementById('comparisonCard');
   const comparisonLabel = document.getElementById('comparisonLabel');
   const comparisonValue = document.getElementById('comparison');
@@ -1903,7 +1947,6 @@ function updateSummary() {
     }
   }
   
-  // Today's journeys and cap
   const todayStr = new Date().toISOString().split('T')[0];
   const todayJourneys = journeys.filter(j => j.date === todayStr);
   const todayTotal = todayJourneys.reduce((sum, j) => sum + j.price, 0);
