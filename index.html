@@ -1871,74 +1871,79 @@ canvas {
 
 
   function setupStationAutocomplete(inputId, suggestionsId) {
-    const input = document.getElementById(inputId);
-    const suggestionsDiv = document.getElementById(suggestionsId);
+  const input = document.getElementById(inputId);
+  const suggestionsDiv = document.getElementById(suggestionsId);
+  
+  input.addEventListener('input', () => {
+    const query = input.value.toLowerCase().trim();
+    const transport = document.getElementById('transportInput').value;
     
-    input.addEventListener('input', () => {
-      const query = input.value.toLowerCase().trim();
-      const transport = document.getElementById('transportInput').value;
+    if (query.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    let filteredStations;
+    if (transport === 'bus') {
+      filteredStations = TFL_STATIONS.filter(station => 
+        station.lines.includes('bus') && station.name.toLowerCase().includes(query)
+      );
+    } else if (transport === 'tram') {
+      filteredStations = TFL_STATIONS.filter(station => 
+        station.lines.includes('tram') && station.name.toLowerCase().includes(query)
+      );
+    } else {
+      filteredStations = TFL_STATIONS.filter(station => 
+        !station.lines.includes('bus') && !station.lines.includes('tram') && station.name.toLowerCase().includes(query)
+      );
+    }
+    
+    const matches = filteredStations.slice(0, 10);
+    
+    if (matches.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    suggestionsDiv.innerHTML = '';
+    matches.forEach(station => {
+      const item = document.createElement('div');
+      item.className = 'station-suggestion-item';
       
-      if (query.length === 0) {
+      const lineBadges = station.lines.map(line => 
+        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+      ).join('');
+      
+      item.innerHTML = `
+        <span class="station-name">${station.name}</span>
+        <div class="line-indicators">${lineBadges}</div>
+      `;
+      
+      item.onclick = () => {
+        input.value = station.name;
         suggestionsDiv.style.display = 'none';
-        return;
-      }
+        input.dispatchEvent(new Event('blur'));
+      };
       
-      let filteredStations;
-      if (transport === 'bus' || transport === 'tram') {
-        filteredStations = TFL_STATIONS.filter(station => 
-          station.lines.includes('bus') && station.name.toLowerCase().includes(query)
-        );
-      } else {
-        filteredStations = TFL_STATIONS.filter(station => 
-          !station.lines.includes('bus') && station.name.toLowerCase().includes(query)
-        );
-      }
-      
-      const matches = filteredStations.slice(0, 10);
-      
-      if (matches.length === 0) {
-        suggestionsDiv.style.display = 'none';
-        return;
-      }
-      
-      suggestionsDiv.innerHTML = '';
-      matches.forEach(station => {
-        const item = document.createElement('div');
-        item.className = 'station-suggestion-item';
-        
-        const lineBadges = station.lines.map(line => 
-          `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
-        ).join('');
-        
-        item.innerHTML = `
-          <span class="station-name">${station.name}</span>
-          <div class="line-indicators">${lineBadges}</div>
-        `;
-        
-        item.onclick = () => {
-          input.value = station.name;
-          suggestionsDiv.style.display = 'none';
-          input.dispatchEvent(new Event('blur'));
-        };
-        
-        suggestionsDiv.appendChild(item);
-      });
-      
-      suggestionsDiv.style.display = 'block';
+      suggestionsDiv.appendChild(item);
     });
     
-    document.addEventListener('click', (e) => {
-      if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-        suggestionsDiv.style.display = 'none';
-      }
-    });
-    
-    input.addEventListener('focus', () => {
-      if (input.value.trim().length > 0) {
-        input.dispatchEvent(new Event('input'));
-      }
-    });
-  }
+    suggestionsDiv.style.display = 'block';
+  });
+  
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.style.display = 'none';
+    }
+  });
+  
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length > 0) {
+      input.dispatchEvent(new Event('input'));
+    }
+  });
+}
+
 
   function capitalizeLineName(line) {
     const names = {
@@ -1967,26 +1972,33 @@ canvas {
   }
 
   function handleTransportChange() {
-    const transport = document.getElementById('transportInput').value;
-    const destinationGroup = document.getElementById('destinationGroup');
-    const originLabel = document.getElementById('originLabel');
-    const originInput = document.getElementById('originInput');
-    
-    if (transport === 'bus' || transport === 'tram') {
-      destinationGroup.style.display = 'none';
-      document.getElementById('destinationInput').value = '';
-      originLabel.textContent = 'Bus Route';
-      originInput.placeholder = 'Select bus number';
-    } else {
-      destinationGroup.style.display = 'block';
-      originLabel.textContent = 'From';
-      originInput.placeholder = 'Origin station';
-    }
-    
-    originInput.value = '';
+  const transport = document.getElementById('transportInput').value;
+  const destinationGroup = document.getElementById('destinationGroup');
+  const originLabel = document.getElementById('originLabel');
+  const originInput = document.getElementById('originInput');
+  
+  if (transport === 'bus') {
+    destinationGroup.style.display = 'none';
     document.getElementById('destinationInput').value = '';
-    document.getElementById('priceInput').value = '';
+    originLabel.textContent = 'Bus Route';
+    originInput.placeholder = 'Select bus number';
+  } else if (transport === 'tram') {
+    destinationGroup.style.display = 'block';
+    originLabel.textContent = 'From';
+    originInput.placeholder = 'Origin tram stop';
+    document.getElementById('destinationInput').placeholder = 'Destination tram stop';
+  } else {
+    destinationGroup.style.display = 'block';
+    originLabel.textContent = 'From';
+    originInput.placeholder = 'Origin station';
+    document.getElementById('destinationInput').placeholder = 'Destination station';
   }
+  
+  originInput.value = '';
+  document.getElementById('destinationInput').value = '';
+  document.getElementById('priceInput').value = '';
+}
+
 
   async function addJourney() {
     const dateTimeValue = document.getElementById('dateTimeInput').value;
