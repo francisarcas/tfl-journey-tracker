@@ -1801,57 +1801,74 @@ canvas {
   }
 
   function setupAutoPriceCalculation() {
-    const dateTimeInput = document.getElementById('dateTimeInput');
-    const transportInput = document.getElementById('transportInput');
-    const originInput = document.getElementById('originInput');
-    const destinationInput = document.getElementById('destinationInput');
-    const priceInput = document.getElementById('priceInput');
-    const loadingIndicator = document.getElementById('priceLoadingIndicator');
+  const dateTimeInput = document.getElementById('dateTimeInput');
+  const transportInput = document.getElementById('transportInput');
+  const originInput = document.getElementById('originInput');
+  const destinationInput = document.getElementById('destinationInput');
+  const priceInput = document.getElementById('priceInput');
+  const loadingIndicator = document.getElementById('priceLoadingIndicator');
+  
+  let calculationTimeout;
+  let lastCalculation = { origin: '', destination: '', dateTime: '', transport: '' };
+  
+  async function updatePrice() {
+    const transport = transportInput.value;
+    const origin = originInput.value.trim();
+    const destination = destinationInput.value.trim();
+    const dateTime = dateTimeInput.value;
     
-    async function updatePrice() {
-      const transport = transportInput.value;
-      const origin = originInput.value.trim();
-      const destination = destinationInput.value.trim();
-      const dateTime = dateTimeInput.value;
-      
-      if (!dateTime || !origin) return;
-      if (transport !== 'bus' && transport !== 'tram' && !destination) return;
-      if (isCalculatingFare) return;
-      
-      isCalculatingFare = true;
-      loadingIndicator.classList.add('active');
-      priceInput.value = '';
-      
-      try {
-        const fare = await TFL_API.calculateJourneyFare(
-          origin, 
-          (transport === 'bus' || transport === 'tram') ? null : destination,
-          dateTime
-        );
-        
-        priceInput.value = fare.toFixed(2);
-        console.log(`Calculated fare: £${fare.toFixed(2)} (${TFL_API.isPeakTime(dateTime) ? 'Peak' : 'Off-Peak'})`);
-      } catch (error) {
-        console.error('Error calculating fare:', error);
-        priceInput.value = '3.40';
-      } finally {
-        isCalculatingFare = false;
-        loadingIndicator.classList.remove('active');
-      }
+    if (!dateTime || !origin) return;
+    if (transport !== 'bus' && transport !== 'tram' && !destination) return;
+    
+    // Check if we already calculated for these exact values
+    if (lastCalculation.origin === origin && 
+        lastCalculation.destination === destination && 
+        lastCalculation.dateTime === dateTime &&
+        lastCalculation.transport === transport) {
+      return; // Don't recalculate
     }
     
-    dateTimeInput.addEventListener('change', updatePrice);
-    transportInput.addEventListener('change', updatePrice);
+    if (isCalculatingFare) return;
     
-    let debounceTimer;
-    const debouncedUpdate = () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(updatePrice, 500);
-    };
+    isCalculatingFare = true;
+    loadingIndicator.classList.add('active');
+    priceInput.value = '';
     
-    originInput.addEventListener('blur', debouncedUpdate);
-    destinationInput.addEventListener('blur', debouncedUpdate);
+    try {
+      const fare = await TFL_API.calculateJourneyFare(
+        origin, 
+        (transport === 'bus' || transport === 'tram') ? null : destination,
+        dateTime
+      );
+      
+      priceInput.value = fare.toFixed(2);
+      
+      // Store this calculation
+      lastCalculation = { origin, destination, dateTime, transport };
+      
+      console.log(`Calculated fare: £${fare.toFixed(2)} (${TFL_API.isPeakTime(dateTime) ? 'Peak' : 'Off-Peak'})`);
+    } catch (error) {
+      console.error('Error calculating fare:', error);
+      priceInput.value = '3.40';
+    } finally {
+      isCalculatingFare = false;
+      loadingIndicator.classList.remove('active');
+    }
   }
+  
+  function scheduleUpdate() {
+    clearTimeout(calculationTimeout);
+    calculationTimeout = setTimeout(updatePrice, 500);
+  }
+  
+  dateTimeInput.addEventListener('change', scheduleUpdate);
+  transportInput.addEventListener('change', scheduleUpdate);
+  
+  // Only trigger on blur (when user finishes typing)
+  originInput.addEventListener('blur', scheduleUpdate);
+  destinationInput.addEventListener('blur', scheduleUpdate);
+}
+
 
   function setupStationAutocomplete(inputId, suggestionsId) {
     const input = document.getElementById(inputId);
