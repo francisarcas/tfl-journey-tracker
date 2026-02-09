@@ -328,7 +328,47 @@ const STATION_ZONES = {
   "North Greenwich": [2, 3],
   "Woolwich": [4],
   "Abbey Wood": [4],
-  "Woolwich Arsenal": [4]
+  "Woolwich Arsenal": [4],
+  
+  // Tram stop zones
+  "Addiscombe": [4],
+  "Addington Village": [5],
+  "Ampere Way": [4],
+  "Arena": [4],
+  "Avenue Road": [4],
+  "Beckenham Junction": [4],
+  "Beckenham Road": [4],
+  "Beddington Lane": [5],
+  "Belgrave Walk": [4],
+  "Birkbeck": [4],
+  "Blackhorse Lane": [3],
+  "Centrale": [5],
+  "Church Street": [4],
+  "Coombe Lane": [4],
+  "Dundonald Road": [4],
+  "East Croydon": [5],
+  "Elmers End": [4],
+  "Fieldway": [5],
+  "George Street": [4],
+  "Gravel Hill": [4],
+  "Harrington Road": [4],
+  "King Henry's Drive": [4],
+  "Lebanon Road": [4],
+  "Lloyd Park": [4],
+  "Merton Park": [3],
+  "Mitcham": [4],
+  "Mitcham Junction": [4],
+  "Morden Road": [4],
+  "New Addington": [6],
+  "Phipps Bridge": [4],
+  "Reeves Corner": [5],
+  "Sandilands": [5],
+  "Therapia Lane": [5],
+  "Waddon Marsh": [5],
+  "Wandle Park": [4],
+  "Wellesley Road": [5],
+  "West Croydon": [5],
+  "Woodside": [4]
 };
 
 const TFL_STATIONS = [
@@ -714,7 +754,7 @@ const TFL_STATIONS = [
   {"name": "Walthamstow Queen's Road", "lines": ["overground"]},
   {"name": "Wandsworth Road", "lines": ["overground"]},
   {"name": "Wanstead Park", "lines": ["overground"]},
-  {"name": "West Croydon", "lines": ["overground"]},
+  {"name": "West Croydon", "lines": ["overground", "tram"]},
   {"name": "White Hart Lane", "lines": ["overground"]},
   {"name": "Woodgrange Park", "lines": ["overground"]},
   {"name": "Abbey Road", "lines": ["dlr"]},
@@ -733,8 +773,10 @@ const TFL_STATIONS = [
   {"name": "Star Lane", "lines": ["dlr"]},
   {"name": "Stratford International", "lines": ["dlr"]},
   {"name": "West Silvertown", "lines": ["dlr"]},
-  {"name": "Addington Village", "lines": ["tram"]},
+  
+  // Tram stops
   {"name": "Addiscombe", "lines": ["tram"]},
+  {"name": "Addington Village", "lines": ["tram"]},
   {"name": "Ampere Way", "lines": ["tram"]},
   {"name": "Arena", "lines": ["tram"]},
   {"name": "Avenue Road", "lines": ["tram"]},
@@ -749,6 +791,7 @@ const TFL_STATIONS = [
   {"name": "Coombe Lane", "lines": ["tram"]},
   {"name": "Dundonald Road", "lines": ["tram"]},
   {"name": "East Croydon", "lines": ["tram"]},
+  {"name": "Elmers End", "lines": ["tram"]},
   {"name": "Fieldway", "lines": ["tram"]},
   {"name": "George Street", "lines": ["tram"]},
   {"name": "Gravel Hill", "lines": ["tram"]},
@@ -766,9 +809,11 @@ const TFL_STATIONS = [
   {"name": "Sandilands", "lines": ["tram"]},
   {"name": "Therapia Lane", "lines": ["tram"]},
   {"name": "Waddon Marsh", "lines": ["tram"]},
+  {"name": "Wandle Park", "lines": ["tram"]},
   {"name": "Wellesley Road", "lines": ["tram"]},
   {"name": "Woodside", "lines": ["tram"]},
   
+
   // Bus Routes
   {"name": "6", "lines": ["bus"]},
   {"name": "12", "lines": ["bus"]},
@@ -1120,5 +1165,6 @@ const TFL_STATIONS = [
   {"name": "BL1", "lines": ["bus"]},
   {"name": "SL6", "lines": ["bus"]},
   {"name": "969", "lines": ["bus"]},
-  {"name": "SCS", "lines": ["bus"]}
+  {"name": "SCS", "lines": ["bus"]},
+
 ];
