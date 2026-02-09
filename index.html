@@ -1084,19 +1084,15 @@ canvas {
 @media (max-width: 600px) {
   .form {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 8px;  /* Add this if not present */
   }
-  
   .form-group {
     width: 100%;
   }
-  
-  .form input[type="datetime-local"],
-  .form input,
-  .form select,
-  .form button {
+  .form input[type="datetime-local"] {
     width: 100%;
-    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .summary-grid {
@@ -1260,7 +1256,6 @@ canvas {
     width: 100%;
   }
 }
-
 
 /* Scrollbar Styling */
 .station-suggestions::-webkit-scrollbar {
