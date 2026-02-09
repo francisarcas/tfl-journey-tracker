@@ -1084,6 +1084,12 @@ canvas {
 @media (max-width: 600px) {
   .form {
     grid-template-columns: 1fr;
+    gap: 8px;  /* Add this if not present */
+  }
+  .form input[type="datetime-local"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .summary-grid {
@@ -1979,6 +1985,10 @@ canvas {
     
     const [dateStr, timeStr] = dateTimeValue.split('T');
     const time = timeStr;
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const year = dateObj.getFullYear();
+    const monthIndex = dateObj.getMonth();
+    const correctMonth = `${year}-${MONTHS[monthIndex]}`;
     
     if (!origin) {
       alert(transport === 'bus' || transport === 'tram' ? 'Please select a bus route' : 'Please enter an origin station');
@@ -1995,14 +2005,14 @@ canvas {
       return;
     }
     
-    const journey = {
+      const journey = {
       date: dateStr,
       time: time,
       transport: transport,
       origin: origin,
       destination: (transport === 'bus' || transport === 'tram') ? null : destination,
       price: price,
-      month: activeMonth
+      month: correctMonth  // CHANGE THIS from activeMonth to correctMonth
     };
     
     const success = await saveJourneyToSupabase(journey);
@@ -2136,6 +2146,12 @@ canvas {
       };
       monthTabsDiv.appendChild(tab);
     });
+    setTimeout(() => {
+    const activeTab = monthTabsDiv.querySelector('.month-tab.active');
+    if (activeTab) {
+      activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, 100);
   }
 
   function renderJourneys() {
@@ -2224,7 +2240,7 @@ canvas {
         
         item.innerHTML = `
           <div class="journey-left">
-            <div class="journey-time">${journey.time}</div>
+            <div class="journey-time">${journey.time.substring(0, 5)}</div>
             <div class="journey-icon ${journey.transport}">
               ${getTransportIcon(journey.transport)}
             </div>
