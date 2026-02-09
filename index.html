@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TFL Journey Tracker</title>
+<title>TFL Tracker</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -416,8 +416,6 @@ h1 {
   transform: translateY(-50%);
 }
 
-
-
 /* Content z-index fix */
 .summary-card.monthly-spend > * {
   position: relative;
@@ -435,86 +433,32 @@ h1 {
 /* Comparison card - savings (green) */
 .summary-card.savings {
   position: relative;
-  background: #198131;
+  border: 1px solid #198131;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
     0 2px 8px rgba(40, 167, 69, 0.15);
 }
 
-.summary-card.savings::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 390px;
-  height: 390px;
-  background: white;
-  border-radius: 50%;
-  top: 50%;
-  left: -140px;
-  transform: translateY(-50%);
-  opacity: 0.2;
-}
 
-.summary-card.savings::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 400px;
-  height: 400px;
-  background: #4caf50;
-  border-radius: 50%;
-  top: 50%;
-  left: -160px;
-  transform: translateY(-50%);
-}
 
 .summary-card.savings .label,
 .summary-card.savings .value,
 .summary-card.savings .subtext {
   position: relative;
   z-index: 1;
-  color: #000;
 }
 
 /* Comparison card - warning (amber) */
 .summary-card.warning {
   position: relative;
-  background: #e0a800;
+  border: 1px solid #e0a800;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
     0 2px 8px rgba(255, 193, 7, 0.15);
 }
 
-/* White curved band */
-.summary-card.warning::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 390px;
-  height: 390px;
-  background: white;
-  border-radius: 50%;
-  top: 50%;
-  left: -140px;
-  transform: translateY(-50%);
-  opacity: 0.2;
-}
-
-/* Main amber curve */
-.summary-card.warning::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 400px;
-  height: 400px;
-  background: #ffc107;
-  border-radius: 50%;
-  top: 50%;
-  left: -160px;
-  transform: translateY(-50%);
-}
 
 /* Ensure content appears above curves */
 .summary-card.warning .label,
@@ -528,39 +472,13 @@ h1 {
 /* Daily cap card - capped (green) */
 .summary-card.capped {
  position: relative;
-  background: #198131;
+  border: 1px solid #198131;
   overflow: hidden;
   box-shadow: 
     0 8px 16px rgba(0,0,0,0.4),
     0 2px 8px rgba(40, 167, 69, 0.15);
 }
 
-.summary-card.capped::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 390px;
-  height: 390px;
-  background: white;
-  border-radius: 50%;
-  top: 50%;
-  left: -140px;
-  transform: translateY(-50%);
-  opacity: 0.2;
-}
-
-.summary-card.capped::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  width: 400px;
-  height: 400px;
-  background: #4caf50;
-  border-radius: 50%;
-  top: 50%;
-  left: -160px;
-  transform: translateY(-50%);
-}
 
 .summary-card.capped .label,
 .summary-card.capped .value,
@@ -749,65 +667,65 @@ button.disabled {
 }
 
 .line-badge {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  width: 5px;
+  height: 10px;
+  border-radius: 8%;
   flex-shrink: 0;
 }
 
 .line-badge.northern {
   background: var(--northern);
-  border: 0.5px solid var(--northern-border);
+  border: 0.3px solid var(--northern-border);
 }
 
 .line-badge.victoria {
   background: var(--victoria);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.central {
   background: var(--central);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.piccadilly {
   background: var(--piccadilly);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.district {
   background: var(--district);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.circle {
   background: var(--circle);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.metropolitan {
   background: var(--metropolitan);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.hammersmith {
   background: var(--hammersmith);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.bakerloo {
   background: var(--bakerloo);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.jubilee {
   background: var(--jubilee);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.waterloo {
   background: var(--waterloo);
-  border: 0.5px solid #333;
+  
 }
 
 .line-badge.elizabeth {
@@ -1188,24 +1106,15 @@ canvas {
   .date-total {
     font-size: 0.8rem;
   }
-  
-  .summary-card.monthly-spend::before,
-  .summary-card.savings::before,
-  .summary-card.warning::before,
-  .summary-card.capped::before {
-    width: 300px;
-    height: 300px;
-    left: -140px;
+  .summary-card.monthly-spend::before {
+    left: -10%;
+  }
+
+  .summary-card.monthly-spend::after {
+    left: -16%;
   }
   
-  .summary-card.monthly-spend::after,
-  .summary-card.savings::after,
-  .summary-card.warning::after,
-  .summary-card.capped::after {
-    width: 300px;
-    height: 300px;
-    left: -155px;
-  }
+  
 }
 
 
@@ -1257,7 +1166,7 @@ canvas {
 
   <h1>
     <img src="assets/logos/tfl.png" alt="TFL" class="tfl-logo">
-    TFL Journey Tracker
+    Mind the Gap
   </h1>
 
   <!-- Summary Cards -->
