@@ -64,7 +64,7 @@ const TFL_API = {
     }
   },
   
-  // Calculate journey fare using TFL Journey Planner API
+  // Calculate journey fare using zone-based calculation
   async calculateJourneyFare(fromStation, toStation, dateTime) {
     try {
       // For bus journeys, return fixed fare
@@ -72,60 +72,7 @@ const TFL_API = {
         return 1.75;
       }
       
-      // Parse the datetime
-      const journeyDate = new Date(dateTime);
-      const year = journeyDate.getFullYear();
-      const month = String(journeyDate.getMonth() + 1).padStart(2, '0');
-      const day = String(journeyDate.getDate()).padStart(2, '0');
-      const hour = String(journeyDate.getHours()).padStart(2, '0');
-      const minute = String(journeyDate.getMinutes()).padStart(2, '0');
-      
-      const timeParam = `${hour}${minute}`;
-      const dateParam = `${year}${month}${day}`;
-      
-      // Search for station IDs first
-      const fromSearch = await this.searchStation(fromStation);
-      const toSearch = await this.searchStation(toStation);
-      
-      if (!fromSearch || !toSearch) {
-        console.error('Could not find station IDs');
-        return this.fallbackFareCalculation(fromStation, toStation, dateTime);
-      }
-      
-      const fromId = fromSearch.id;
-      const toId = toSearch.id;
-      
-      // Use Journey Planner API
-      const journeyUrl = `${this.baseUrl}/Journey/JourneyResults/${encodeURIComponent(fromId)}/to/${encodeURIComponent(toId)}?date=${dateParam}&time=${timeParam}&app_key=${this.keys.journey}`;
-      
-      const response = await fetch(journeyUrl);
-      
-      if (!response.ok) {
-        console.error('Journey API failed:', response.status);
-        return this.fallbackFareCalculation(fromStation, toStation, dateTime);
-      }
-      
-      const data = await response.json();
-      
-      // Extract fare from the journey data
-      if (data.journeys && data.journeys.length > 0) {
-        const journey = data.journeys[0];
-        
-        // Try to get fare information
-        if (journey.fare && journey.fare.totalCost) {
-          return journey.fare.totalCost / 100; // Convert pence to pounds
-        }
-        
-        // If no fare in journey, try fares array
-        if (data.fares && data.fares.length > 0) {
-          const adultFare = data.fares.find(f => f.passengerType === 'Adult');
-          if (adultFare && adultFare.cost) {
-            return adultFare.cost / 100;
-          }
-        }
-      }
-      
-      // Fallback to zone-based calculation
+      // Always use zone-based calculation
       return this.fallbackFareCalculation(fromStation, toStation, dateTime);
       
     } catch (error) {
@@ -160,53 +107,83 @@ const TFL_API = {
   
   // Fallback fare calculation using zone data
   async fallbackFareCalculation(fromStation, toStation, dateTime) {
-    const fromDetails = await this.getStationDetails(fromStation);
-    const toDetails = toStation ? await this.getStationDetails(toStation) : fromDetails;
+    // First try to get zone info from STATION_ZONES (from station-data.js)
+    let fromZones = STATION_ZONES[fromStation];
+    let toZones = toStation ? STATION_ZONES[toStation] : fromZones;
     
-    if (!fromDetails || !toDetails) {
-      console.warn('Using default fare - station details not found');
-      return 3.40; // Default fare
+    // If not found in STATION_ZONES, try API
+    if (!fromZones) {
+      const fromDetails = await this.getStationDetails(fromStation);
+      fromZones = fromDetails ? fromDetails.zones : [1];
     }
     
-    const minFromZone = Math.min(...fromDetails.zones);
-    const maxToZone = Math.max(...toDetails.zones);
+    if (!toZones && toStation) {
+      const toDetails = await this.getStationDetails(toStation);
+      toZones = toDetails ? toDetails.zones : [1];
+    }
+    
+    // Default to zone 1 if still not found
+    if (!fromZones) fromZones = [1];
+    if (!toZones) toZones = [1];
+    
+    // Calculate the highest zone traveled through
+    const allZones = [...fromZones, ...toZones];
+    const highestZone = Math.max(...allZones);
     
     const isPeak = this.isPeakTime(dateTime);
     
-    // 2026 TFL Fare matrix (updated with correct fares)
+    // 2026 TFL Fare matrix - CORRECTED with real TFL contactless fares
     const fareMatrix = {
-      '1-1': { peak: 3.10, offPeak: 3.00 },
-      '1-2': { peak: 3.60, offPeak: 3.10 },
-      '1-3': { peak: 4.20, offPeak: 3.50 },
-      '1-4': { peak: 4.80, offPeak: 3.80 },
-      '1-5': { peak: 5.40, offPeak: 3.80 },
-      '1-6': { peak: 5.90, offPeak: 4.20 },
-      '2-2': { peak: 2.10, offPeak: 1.90 },
-      '2-3': { peak: 2.50, offPeak: 2.10 },
-      '2-4': { peak: 2.80, offPeak: 2.30 },
-      '2-5': { peak: 3.20, offPeak: 2.50 },
-      '2-6': { peak: 3.50, offPeak: 2.70 },
-      '3-3': { peak: 2.10, offPeak: 1.90 },
-      '3-4': { peak: 2.40, offPeak: 2.00 },
-      '3-5': { peak: 2.70, offPeak: 2.20 },
-      '3-6': { peak: 3.00, offPeak: 2.40 },
-      '4-4': { peak: 2.10, offPeak: 1.90 },
-      '4-5': { peak: 2.40, offPeak: 2.00 },
-      '4-6': { peak: 2.70, offPeak: 2.20 },
-      '5-5': { peak: 2.10, offPeak: 1.90 },
-      '5-6': { peak: 2.40, offPeak: 2.00 },
-      '6-6': { peak: 2.10, offPeak: 1.90 }
+      '1-1': { peak: 2.80, offPeak: 2.80 },
+      '1-2': { peak: 3.70, offPeak: 2.80 },
+      '1-3': { peak: 4.10, offPeak: 2.90 },
+      '1-4': { peak: 4.60, offPeak: 3.40 },
+      '1-5': { peak: 5.10, offPeak: 3.40 },
+      '1-6': { peak: 5.60, offPeak: 3.40 },
+      '2-2': { peak: 2.50, offPeak: 1.90 },
+      '2-3': { peak: 2.50, offPeak: 1.90 },
+      '2-4': { peak: 2.50, offPeak: 1.90 },
+      '2-5': { peak: 3.00, offPeak: 1.90 },
+      '2-6': { peak: 3.00, offPeak: 1.90 },
+      '3-3': { peak: 2.50, offPeak: 1.90 },
+      '3-4': { peak: 2.50, offPeak: 1.90 },
+      '3-5': { peak: 3.00, offPeak: 1.90 },
+      '3-6': { peak: 3.00, offPeak: 1.90 },
+      '4-4': { peak: 2.50, offPeak: 2.20 },
+      '4-5': { peak: 3.00, offPeak: 2.20 },
+      '4-6': { peak: 3.00, offPeak: 2.20 },
+      '5-5': { peak: 3.00, offPeak: 2.20 },
+      '5-6': { peak: 3.00, offPeak: 2.20 },
+      '6-6': { peak: 3.00, offPeak: 2.20 }
     };
     
-    const zoneKey = `${minFromZone}-${maxToZone}`;
+    // Determine the fare zone key
+    // If journey crosses zone 1, use 1-X format
+    // Otherwise use min-max format
+    const minZone = Math.min(...allZones);
+    const maxZone = Math.max(...allZones);
     
-    if (fareMatrix[zoneKey]) {
-      return isPeak ? fareMatrix[zoneKey].peak : fareMatrix[zoneKey].offPeak;
+    let zoneKey;
+    if (minZone === 1) {
+      // Journey involves Zone 1
+      zoneKey = maxZone === 1 ? '1-1' : `1-${maxZone}`;
+    } else {
+      // Journey doesn't involve Zone 1
+      zoneKey = minZone === maxZone ? `${minZone}-${minZone}` : `${minZone}-${maxZone}`;
     }
     
-    // Calculate based on zone difference if not in matrix
-    const zoneDiff = maxToZone - minFromZone;
-    return isPeak ? (3.10 + zoneDiff * 0.50) : (3.00 + zoneDiff * 0.40);
+    console.log(`Fare calculation: ${fromStation} (zones: ${fromZones}) → ${toStation} (zones: ${toZones})`);
+    console.log(`Zone key: ${zoneKey}, Peak: ${isPeak}`);
+    
+    if (fareMatrix[zoneKey]) {
+      const fare = isPeak ? fareMatrix[zoneKey].peak : fareMatrix[zoneKey].offPeak;
+      console.log(`Fare: £${fare.toFixed(2)}`);
+      return fare;
+    }
+    
+    // Fallback calculation if zone combination not in matrix
+    console.warn('Using fallback calculation for zone:', zoneKey);
+    return isPeak ? 4.60 : 3.40;
   },
   
   // Check if journey time is peak
