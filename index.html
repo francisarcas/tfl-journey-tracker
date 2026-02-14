@@ -432,62 +432,10 @@ h1 {
   color: #000;
 }
 
-/* Comparison card - savings (green) */
-.summary-card.savings {
-  position: relative;
-  border: 1px solid #198131;
-  overflow: hidden;
-  box-shadow: 
-    0 8px 16px rgba(0,0,0,0.4),
-    0 2px 8px rgba(40, 167, 69, 0.15);
+/* Comparison card - red outline when exceeds monthly card */
+.summary-card.exceeds-monthly {
+  border: 2px solid var(--danger-border);
 }
-
-
-
-.summary-card.savings .label,
-.summary-card.savings .value,
-.summary-card.savings .subtext {
-  position: relative;
-  z-index: 1;
-}
-
-/* Comparison card - warning (amber) */
-.summary-card.warning {
-  position: relative;
-  border: 1px solid #e0a800;
-  overflow: hidden;
-  box-shadow: 
-    0 8px 16px rgba(0,0,0,0.4),
-    0 2px 8px rgba(255, 193, 7, 0.15);
-}
-
-
-/* Ensure content appears above curves */
-.summary-card.warning .label,
-.summary-card.warning .value,
-.summary-card.warning .subtext {
-  position: relative;
-  z-index: 1;
-}
-
-/* Daily cap card - capped (green) */
-.summary-card.capped {
- position: relative;
-  border: 1px solid #198131;
-  overflow: hidden;
-  box-shadow: 
-    0 8px 16px rgba(0,0,0,0.4),
-    0 2px 8px rgba(40, 167, 69, 0.15);
-}
-
-
-.summary-card.capped .label,
-.summary-card.capped .value,
-.summary-card.capped .subtext {
-  position: relative;
-  z-index: 1;
-}
-
 
 /* Month Tabs */
 .month-tabs, .year-tabs {
@@ -938,6 +886,14 @@ button.disabled {
   color: var(--text);
 }
 
+.action.edit {
+  color: var(--accent1);
+}
+
+.action.edit:hover {
+  color: #3a9eff;
+}
+
 .action.delete {
   color: var(--danger);
 }
@@ -1007,12 +963,12 @@ canvas {
 /* Auth Container Centering */
 #authContainer {
   text-align: center;
-  max-width: 520px; /* Increased from 420px */
+  max-width: 520px;
   margin: auto;
   z-index: 1000;
   width: 90%;
   box-sizing: border-box;
-  padding-top: 20px; /* Add space for logo above */
+  padding-top: 20px;
 }
 
 #authContainer #authTitle {
@@ -1041,7 +997,7 @@ canvas {
   flex: 1;
   width: auto;
   margin-bottom: 0;
-  min-width: 0; /* Allow inputs to shrink properly */
+  min-width: 0;
 }
 
 /* Auth Buttons - Side by side */
@@ -1084,7 +1040,7 @@ canvas {
 @media (max-width: 600px) {
   .form {
     grid-template-columns: 1fr;
-    gap: 8px;  /* Add this if not present */
+    gap: 8px;
   }
   .form-group {
     width: 100%;
@@ -1101,10 +1057,10 @@ canvas {
   
   .top-bar-container {
     justify-content: center;
-    padding-top: 10px;
+    padding-top: 4%;
+    margin-bottom: 6%;
   }
   
-  /* Fix h1 title sizing */
   h1 {
     font-size: 1.5rem;
     margin-top: 12px;
@@ -1120,12 +1076,21 @@ canvas {
   #user-menu {
     height: 40px;
     border-radius: 20px;
+    margin-right: 20px;
   }
   
   .menu-content {
     height: 40px;
     min-width: 160px;
     max-width: 170px;
+  }
+  
+  #userMenuToggle {
+    width: 160px;
+  }
+  
+  #userMenuToggle:checked {
+    width: 190px;
   }
   
   #userMenuToggle:checked ~ .menu-content {
@@ -1154,7 +1119,19 @@ canvas {
     width: 36px;
   }
   
-  /* Fix journey item layout - time and icon stacked vertically */
+  /* Mobile-specific curve adjustments for monthly-spend card */
+  .summary-card.monthly-spend::before {
+    width: 350px;
+    height: 350px;
+    left: -30px;
+  }
+
+  .summary-card.monthly-spend::after {
+    width: 360px;
+    height: 360px;
+    left: -50px;
+  }
+  
   .journey-item {
     display: flex;
     flex-direction: column;
@@ -1169,7 +1146,6 @@ canvas {
     width: 100%;
   }
   
-  /* Time and icon column - stacked vertically */
   .journey-time {
     display: flex;
     flex-direction: column;
@@ -1201,7 +1177,6 @@ canvas {
     font-size: 0.75rem;
   }
   
-  /* Price and actions on same row, close together */
   .journey-right {
     display: flex;
     justify-content: flex-end;
@@ -1229,15 +1204,6 @@ canvas {
     font-size: 0.8rem;
   }
   
-  .summary-card.monthly-spend::before {
-    left: -10%;
-  }
-
-  .summary-card.monthly-spend::after {
-    left: -16%;
-  }
-  
-  /* Auth mobile styles */
   #authContainer {
     max-width: 90%;
   }
@@ -1295,14 +1261,10 @@ canvas {
       <button onclick="handleAuth('login')" id="loginBtn">
         <i class="fa-solid fa-right-to-bracket"></i> Login
       </button>
-      <!--<button onclick="handleAuth('signup')" id="signupBtn" style="background: var(--interactive-bg); color: var(--text);">
-        <i class="fa-solid fa-user-plus"></i> Sign Up
-      </button>-->
     </div>
     
     <p id="authMessage" style="color: var(--danger); margin-top: 10px; min-height: 20px;"></p>
     
-    <!-- Footer inside auth container -->
     <div class="auth-footer">
       <a href="https://www.linkedin.com/in/francisarcas/" target="_blank" class="footer-link" title="Francis Arcas LinkedIn">
         <i class="fa-brands fa-linkedin footer-icon"></i>
@@ -1318,7 +1280,6 @@ canvas {
 
 
 <div id="appContentWrapper" class="container">
-  <!-- Top Bar with User Menu and Settings -->
   <div class="top-bar-container">
     <div id="user-menu">
       <input type="checkbox" id="userMenuToggle" />
@@ -1329,7 +1290,7 @@ canvas {
           <div id="userMenuUsername" class="username">TFL User</div>
         </div>
         <div class="logout-area">
-          <button class="logout-btn" onclick="handleLogout()">
+          <button class="logout-btn" onclick="handleLogout(); event.stopPropagation();">
           <i class="fa-solid fa-right-from-bracket"></i>
         </button>
         </div>
@@ -1346,7 +1307,6 @@ canvas {
     Mind the Gap
   </h1>
 
-  <!-- Summary Cards -->
   <div class="summary-grid">
     <div class="summary-card monthly-spend">
       <div class="label">This Month</div>
@@ -1365,21 +1325,18 @@ canvas {
     </div>
   </div>
 
-  <!-- Chart -->
   <div class="card">
     <div class="chart-wrapper">
       <canvas id="spendingChart"></canvas>
     </div>
   </div>
 
-  <!-- Month/Year Selector -->
   <div class="card">
     <div class="year-tabs" id="yearTabs"></div>
     <div class="year-month-separator"></div>
     <div class="month-tabs" id="monthTabs"></div>
   </div>
 
-  <!-- Journey Input Form -->
   <div class="card">
     <div class="form">
       <div class="form-group">
@@ -1416,13 +1373,12 @@ canvas {
         </div>
         <input id="priceInput" type="number" step="0.01" placeholder="£" required>
       </div>
-      <button onclick="addJourney()" style="margin-top: 18px;">
+      <button onclick="addJourney()" id="addJourneyBtn" style="margin-top: 18px;">
         <i class="fa-solid fa-circle-plus"></i>
       </button>
     </div>
   </div>
 
-  <!-- Journey List -->
   <div class="card">
     <div id="journeyList">
       <div class="empty-state">
@@ -1434,7 +1390,6 @@ canvas {
   </div>
 </div>
 
-<!-- Settings Modal -->
 <div id="settingsModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -1479,12 +1434,10 @@ canvas {
   let loggedInUserProfile = null;
   let householdProfilesMap = new Map();
 
-  // DOM elements
   let authContainer, authEmail, authPassword, authMessage;
   let appContentWrapper;
   let userMenu, userMenuToggle, userMenuAvatar, userMenuGreeting, userMenuUsername;
 
-  // Initialize Supabase
   try {
     mySupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
@@ -1492,7 +1445,6 @@ canvas {
     alert("Error: Supabase library failed to load. Please check your internet connection.");
   }
 
-  // Global variables
   const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
   const today = new Date();
@@ -1503,6 +1455,7 @@ canvas {
   let isCalculatingFare = false;
   let userHomeZone = 4;
   let monthlyCardCost = 246.60;
+  let editingJourneyId = null;
 
   function getGreeting(userName) {
     const hour = new Date().getHours();
@@ -1519,10 +1472,6 @@ canvas {
     }
     return `${greetingPhrase},`;
   }
-
-  // =====================================================
-  // AUTH FUNCTIONS
-  // =====================================================
 
   async function handleAuth(type) {
     authMessage.textContent = '';
@@ -1580,6 +1529,12 @@ canvas {
   }
 
   async function handleLogout() {
+    // Uncheck the menu toggle first
+    const menuToggle = document.getElementById('userMenuToggle');
+    if (menuToggle) {
+      menuToggle.checked = false;
+    }
+    
     const { error } = await mySupabaseClient.auth.signOut();
     if (error) {
       console.error("Logout error:", error);
@@ -1589,6 +1544,7 @@ canvas {
       loggedInUserProfile = null;
       householdProfilesMap.clear();
       journeys = [];
+      editingJourneyId = null;
       updateAuthUI();
       updateAll();
     }
@@ -1618,10 +1574,6 @@ canvas {
       userMenuToggle.checked = false;
     }
   }
-
-  // =====================================================
-  // SUPABASE DATA FUNCTIONS
-  // =====================================================
 
   async function fetchJourneysFromSupabase() {
     if (!mySupabaseClient || !currentUser || !loggedInUserProfile) {
@@ -1679,6 +1631,35 @@ canvas {
     return true;
   }
 
+  async function updateJourneyInSupabase(id, journey) {
+    if (!currentUser || !loggedInUserProfile) {
+      alert("You must be logged in to edit a journey.");
+      return false;
+    }
+
+    const { error } = await mySupabaseClient
+      .from('journeys')
+      .update({
+        date: journey.date,
+        time: journey.time,
+        transport: journey.transport,
+        origin: journey.origin,
+        destination: journey.destination,
+        price: journey.price,
+        month: journey.month
+      })
+      .eq('id', id)
+      .eq('household_id', loggedInUserProfile.household_id);
+
+    if (error) {
+      console.error("Error updating journey:", error);
+      alert("Error updating journey. Please check the console.");
+      return false;
+    }
+
+    return true;
+  }
+
   async function deleteJourneyFromSupabase(id) {
     const { error } = await mySupabaseClient
       .from('journeys')
@@ -1695,10 +1676,6 @@ canvas {
     return true;
   }
 
-  // =====================================================
-  // SETTINGS FUNCTIONS
-  // =====================================================
-
   async function loadUserSettings() {
     if (!currentUser) return;
 
@@ -1708,7 +1685,7 @@ canvas {
       .eq('user_id', currentUser.id)
       .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+    if (error && error.code !== 'PGRST116') {
       console.error("Error loading settings:", error);
       return;
     }
@@ -1773,10 +1750,6 @@ canvas {
     }, 2000);
   }
 
-  // =====================================================
-  // JOURNEY FUNCTIONS
-  // =====================================================
-
   function getDailyCap(journeyList) {
     const allBus = journeyList.every(j => j.transport === 'bus' || j.transport === 'tram');
     
@@ -1804,149 +1777,144 @@ canvas {
   }
 
   function setupAutoPriceCalculation() {
-  const dateTimeInput = document.getElementById('dateTimeInput');
-  const transportInput = document.getElementById('transportInput');
-  const originInput = document.getElementById('originInput');
-  const destinationInput = document.getElementById('destinationInput');
-  const priceInput = document.getElementById('priceInput');
-  const loadingIndicator = document.getElementById('priceLoadingIndicator');
-  
-  let calculationTimeout;
-  let lastCalculation = { origin: '', destination: '', dateTime: '', transport: '' };
-  
-  async function updatePrice() {
-    const transport = transportInput.value;
-    const origin = originInput.value.trim();
-    const destination = destinationInput.value.trim();
-    const dateTime = dateTimeInput.value;
+    const dateTimeInput = document.getElementById('dateTimeInput');
+    const transportInput = document.getElementById('transportInput');
+    const originInput = document.getElementById('originInput');
+    const destinationInput = document.getElementById('destinationInput');
+    const priceInput = document.getElementById('priceInput');
+    const loadingIndicator = document.getElementById('priceLoadingIndicator');
     
-    if (!dateTime || !origin) return;
-    if (transport !== 'bus' && transport !== 'tram' && !destination) return;
+    let calculationTimeout;
+    let lastCalculation = { origin: '', destination: '', dateTime: '', transport: '' };
     
-    // Check if we already calculated for these exact values
-    if (lastCalculation.origin === origin && 
-        lastCalculation.destination === destination && 
-        lastCalculation.dateTime === dateTime &&
-        lastCalculation.transport === transport) {
-      return; // Don't recalculate
+    async function updatePrice() {
+      const transport = transportInput.value;
+      const origin = originInput.value.trim();
+      const destination = destinationInput.value.trim();
+      const dateTime = dateTimeInput.value;
+      
+      if (!dateTime || !origin) return;
+      if (transport !== 'bus' && transport !== 'tram' && !destination) return;
+      
+      if (lastCalculation.origin === origin && 
+          lastCalculation.destination === destination && 
+          lastCalculation.dateTime === dateTime &&
+          lastCalculation.transport === transport) {
+        return;
+      }
+      
+      if (isCalculatingFare) return;
+      
+      isCalculatingFare = true;
+      loadingIndicator.classList.add('active');
+      priceInput.value = '';
+      
+      try {
+        const fare = await TFL_API.calculateJourneyFare(
+          origin, 
+          (transport === 'bus' || transport === 'tram') ? null : destination,
+          dateTime
+        );
+        
+        priceInput.value = fare.toFixed(2);
+        
+        lastCalculation = { origin, destination, dateTime, transport };
+        
+        console.log(`Calculated fare: £${fare.toFixed(2)} (${TFL_API.isPeakTime(dateTime) ? 'Peak' : 'Off-Peak'})`);
+      } catch (error) {
+        console.error('Error calculating fare:', error);
+        priceInput.value = '3.40';
+      } finally {
+        isCalculatingFare = false;
+        loadingIndicator.classList.remove('active');
+      }
     }
     
-    if (isCalculatingFare) return;
-    
-    isCalculatingFare = true;
-    loadingIndicator.classList.add('active');
-    priceInput.value = '';
-    
-    try {
-      const fare = await TFL_API.calculateJourneyFare(
-        origin, 
-        (transport === 'bus' || transport === 'tram') ? null : destination,
-        dateTime
-      );
-      
-      priceInput.value = fare.toFixed(2);
-      
-      // Store this calculation
-      lastCalculation = { origin, destination, dateTime, transport };
-      
-      console.log(`Calculated fare: £${fare.toFixed(2)} (${TFL_API.isPeakTime(dateTime) ? 'Peak' : 'Off-Peak'})`);
-    } catch (error) {
-      console.error('Error calculating fare:', error);
-      priceInput.value = '3.40';
-    } finally {
-      isCalculatingFare = false;
-      loadingIndicator.classList.remove('active');
+    function scheduleUpdate() {
+      clearTimeout(calculationTimeout);
+      calculationTimeout = setTimeout(updatePrice, 500);
     }
+    
+    dateTimeInput.addEventListener('change', scheduleUpdate);
+    transportInput.addEventListener('change', scheduleUpdate);
+    
+    originInput.addEventListener('blur', scheduleUpdate);
+    destinationInput.addEventListener('blur', scheduleUpdate);
   }
-  
-  function scheduleUpdate() {
-    clearTimeout(calculationTimeout);
-    calculationTimeout = setTimeout(updatePrice, 500);
-  }
-  
-  dateTimeInput.addEventListener('change', scheduleUpdate);
-  transportInput.addEventListener('change', scheduleUpdate);
-  
-  // Only trigger on blur (when user finishes typing)
-  originInput.addEventListener('blur', scheduleUpdate);
-  destinationInput.addEventListener('blur', scheduleUpdate);
-}
-
 
   function setupStationAutocomplete(inputId, suggestionsId) {
-  const input = document.getElementById(inputId);
-  const suggestionsDiv = document.getElementById(suggestionsId);
-  
-  input.addEventListener('input', () => {
-    const query = input.value.toLowerCase().trim();
-    const transport = document.getElementById('transportInput').value;
+    const input = document.getElementById(inputId);
+    const suggestionsDiv = document.getElementById(suggestionsId);
     
-    if (query.length === 0) {
-      suggestionsDiv.style.display = 'none';
-      return;
-    }
-    
-    let filteredStations;
-    if (transport === 'bus') {
-      filteredStations = TFL_STATIONS.filter(station => 
-        station.lines.includes('bus') && station.name.toLowerCase().includes(query)
-      );
-    } else if (transport === 'tram') {
-      filteredStations = TFL_STATIONS.filter(station => 
-        station.lines.includes('tram') && station.name.toLowerCase().includes(query)
-      );
-    } else {
-      filteredStations = TFL_STATIONS.filter(station => 
-        !station.lines.includes('bus') && !station.lines.includes('tram') && station.name.toLowerCase().includes(query)
-      );
-    }
-    
-    const matches = filteredStations.slice(0, 10);
-    
-    if (matches.length === 0) {
-      suggestionsDiv.style.display = 'none';
-      return;
-    }
-    
-    suggestionsDiv.innerHTML = '';
-    matches.forEach(station => {
-      const item = document.createElement('div');
-      item.className = 'station-suggestion-item';
+    input.addEventListener('input', () => {
+      const query = input.value.toLowerCase().trim();
+      const transport = document.getElementById('transportInput').value;
       
-      const lineBadges = station.lines.map(line => 
-        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
-      ).join('');
-      
-      item.innerHTML = `
-        <span class="station-name">${station.name}</span>
-        <div class="line-indicators">${lineBadges}</div>
-      `;
-      
-      item.onclick = () => {
-        input.value = station.name;
+      if (query.length === 0) {
         suggestionsDiv.style.display = 'none';
-        input.dispatchEvent(new Event('blur'));
-      };
+        return;
+      }
       
-      suggestionsDiv.appendChild(item);
+      let filteredStations;
+      if (transport === 'bus') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('bus') && station.name.toLowerCase().includes(query)
+        );
+      } else if (transport === 'tram') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('tram') && station.name.toLowerCase().includes(query)
+        );
+      } else {
+        filteredStations = TFL_STATIONS.filter(station => 
+          !station.lines.includes('bus') && !station.lines.includes('tram') && station.name.toLowerCase().includes(query)
+        );
+      }
+      
+      const matches = filteredStations.slice(0, 10);
+      
+      if (matches.length === 0) {
+        suggestionsDiv.style.display = 'none';
+        return;
+      }
+      
+      suggestionsDiv.innerHTML = '';
+      matches.forEach(station => {
+        const item = document.createElement('div');
+        item.className = 'station-suggestion-item';
+        
+        const lineBadges = station.lines.map(line => 
+          `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+        ).join('');
+        
+        item.innerHTML = `
+          <span class="station-name">${station.name}</span>
+          <div class="line-indicators">${lineBadges}</div>
+        `;
+        
+        item.onclick = () => {
+          input.value = station.name;
+          suggestionsDiv.style.display = 'none';
+          input.dispatchEvent(new Event('blur'));
+        };
+        
+        suggestionsDiv.appendChild(item);
+      });
+      
+      suggestionsDiv.style.display = 'block';
     });
     
-    suggestionsDiv.style.display = 'block';
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-      suggestionsDiv.style.display = 'none';
-    }
-  });
-  
-  input.addEventListener('focus', () => {
-    if (input.value.trim().length > 0) {
-      input.dispatchEvent(new Event('input'));
-    }
-  });
-}
-
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+        suggestionsDiv.style.display = 'none';
+      }
+    });
+    
+    input.addEventListener('focus', () => {
+      if (input.value.trim().length > 0) {
+        input.dispatchEvent(new Event('input'));
+      }
+    });
+  }
 
   function capitalizeLineName(line) {
     const names = {
@@ -1975,33 +1943,32 @@ canvas {
   }
 
   function handleTransportChange() {
-  const transport = document.getElementById('transportInput').value;
-  const destinationGroup = document.getElementById('destinationGroup');
-  const originLabel = document.getElementById('originLabel');
-  const originInput = document.getElementById('originInput');
-  
-  if (transport === 'bus') {
-    destinationGroup.style.display = 'none';
+    const transport = document.getElementById('transportInput').value;
+    const destinationGroup = document.getElementById('destinationGroup');
+    const originLabel = document.getElementById('originLabel');
+    const originInput = document.getElementById('originInput');
+    
+    if (transport === 'bus') {
+      destinationGroup.style.display = 'none';
+      document.getElementById('destinationInput').value = '';
+      originLabel.textContent = 'Bus Route';
+      originInput.placeholder = 'Select bus number';
+    } else if (transport === 'tram') {
+      destinationGroup.style.display = 'block';
+      originLabel.textContent = 'From';
+      originInput.placeholder = 'Origin tram stop';
+      document.getElementById('destinationInput').placeholder = 'Destination tram stop';
+    } else {
+      destinationGroup.style.display = 'block';
+      originLabel.textContent = 'From';
+      originInput.placeholder = 'Origin station';
+      document.getElementById('destinationInput').placeholder = 'Destination station';
+    }
+    
+    originInput.value = '';
     document.getElementById('destinationInput').value = '';
-    originLabel.textContent = 'Bus Route';
-    originInput.placeholder = 'Select bus number';
-  } else if (transport === 'tram') {
-    destinationGroup.style.display = 'block';
-    originLabel.textContent = 'From';
-    originInput.placeholder = 'Origin tram stop';
-    document.getElementById('destinationInput').placeholder = 'Destination tram stop';
-  } else {
-    destinationGroup.style.display = 'block';
-    originLabel.textContent = 'From';
-    originInput.placeholder = 'Origin station';
-    document.getElementById('destinationInput').placeholder = 'Destination station';
+    document.getElementById('priceInput').value = '';
   }
-  
-  originInput.value = '';
-  document.getElementById('destinationInput').value = '';
-  document.getElementById('priceInput').value = '';
-}
-
 
   async function addJourney() {
     const dateTimeValue = document.getElementById('dateTimeInput').value;
@@ -2037,17 +2004,26 @@ canvas {
       return;
     }
     
-      const journey = {
+    const journey = {
       date: dateStr,
       time: time,
       transport: transport,
       origin: origin,
       destination: (transport === 'bus' || transport === 'tram') ? null : destination,
       price: price,
-      month: correctMonth  // CHANGE THIS from activeMonth to correctMonth
+      month: correctMonth
     };
     
-    const success = await saveJourneyToSupabase(journey);
+    let success;
+    if (editingJourneyId) {
+      success = await updateJourneyInSupabase(editingJourneyId, journey);
+      if (success) {
+        editingJourneyId = null;
+        document.getElementById('addJourneyBtn').innerHTML = '<i class="fa-solid fa-circle-plus"></i>';
+      }
+    } else {
+      success = await saveJourneyToSupabase(journey);
+    }
     
     if (success) {
       document.getElementById('originInput').value = '';
@@ -2065,8 +2041,28 @@ canvas {
       await fetchJourneysFromSupabase();
       updateAll();
       
-      console.log('Journey added:', journey);
+      console.log('Journey ' + (editingJourneyId ? 'updated' : 'added') + ':', journey);
     }
+  }
+
+  function editJourney(id) {
+    const journey = journeys.find(j => j.id === id);
+    if (!journey) return;
+    
+    editingJourneyId = id;
+    
+    document.getElementById('dateTimeInput').value = `${journey.date}T${journey.time}`;
+    document.getElementById('transportInput').value = journey.transport;
+    handleTransportChange();
+    document.getElementById('originInput').value = journey.origin;
+    if (journey.destination) {
+      document.getElementById('destinationInput').value = journey.destination;
+    }
+    document.getElementById('priceInput').value = journey.price.toFixed(2);
+    
+    document.getElementById('addJourneyBtn').innerHTML = '<i class="fa-solid fa-check"></i>';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function deleteJourney(id) {
@@ -2075,14 +2071,14 @@ canvas {
     const success = await deleteJourneyFromSupabase(id);
     
     if (success) {
+      if (editingJourneyId === id) {
+        editingJourneyId = null;
+        document.getElementById('addJourneyBtn').innerHTML = '<i class="fa-solid fa-circle-plus"></i>';
+      }
       await fetchJourneysFromSupabase();
       updateAll();
     }
   }
-
-  // =====================================================
-  // RENDERING FUNCTIONS
-  // =====================================================
 
   function renderYears() {
     const yearTabsDiv = document.getElementById('yearTabs');
@@ -2179,11 +2175,11 @@ canvas {
       monthTabsDiv.appendChild(tab);
     });
     setTimeout(() => {
-    const activeTab = monthTabsDiv.querySelector('.month-tab.active');
-    if (activeTab) {
-      activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-  }, 100);
+      const activeTab = monthTabsDiv.querySelector('.month-tab.active');
+      if (activeTab) {
+        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }, 100);
   }
 
   function renderJourneys() {
@@ -2284,7 +2280,10 @@ canvas {
           <div class="journey-right">
             <div class="journey-price">£${journey.price.toFixed(2)}</div>
             <div class="journey-actions">
-              <span class="action delete" onclick="deleteJourney('${journey.id}')">
+              <span class="action edit" onclick="editJourney('${journey.id}')" title="Edit journey">
+                <i class="fa-solid fa-pencil"></i>
+              </span>
+              <span class="action delete" onclick="deleteJourney('${journey.id}')" title="Delete journey">
                 <i class="fa-solid fa-trash"></i>
               </span>
             </div>
@@ -2358,19 +2357,19 @@ canvas {
     const zoneText = userHomeZone === 1 ? 'Zone 1' : `Zones 1-${userHomeZone}`;
     comparisonLabel.textContent = `Monthly Card (${zoneText})`;
     
+    comparisonCard.classList.remove('exceeds-monthly');
+    
     if (totalEffectiveSpend === 0) {
-      comparisonCard.className = 'summary-card';
       comparisonValue.textContent = '-';
       comparisonText.textContent = 'Start tracking to compare';
     } else {
       const difference = monthlyCardCost - totalEffectiveSpend;
       
       if (difference > 0) {
-        comparisonCard.className = 'summary-card savings';
         comparisonValue.textContent = `£${difference.toFixed(2)}`;
         comparisonText.textContent = 'Saved with contactless';
       } else {
-        comparisonCard.className = 'summary-card warning';
+        comparisonCard.classList.add('exceeds-monthly');
         comparisonValue.textContent = `£${Math.abs(difference).toFixed(2)}`;
         comparisonText.textContent = 'Oyster card would save money';
       }
@@ -2380,23 +2379,19 @@ canvas {
     const todayJourneys = journeys.filter(j => j.date === todayStr);
     const todayTotal = todayJourneys.reduce((sum, j) => sum + j.price, 0);
     
-    const dailyCapCard = document.getElementById('dailyCapCard');
     const todaySpendEl = document.getElementById('todaySpend');
     const capStatusEl = document.getElementById('capStatus');
     
     todaySpendEl.textContent = `£${todayTotal.toFixed(2)}`;
     
     if (todayJourneys.length === 0) {
-      dailyCapCard.className = 'summary-card';
       capStatusEl.textContent = 'No journeys today';
     } else {
       const dailyCap = getDailyCap(todayJourneys);
       
       if (todayTotal >= dailyCap) {
-        dailyCapCard.className = 'summary-card capped';
         capStatusEl.textContent = `⚡ Daily cap reached (£${dailyCap.toFixed(2)})`;
       } else {
-        dailyCapCard.className = 'summary-card';
         const remaining = dailyCap - todayTotal;
         capStatusEl.textContent = `£${remaining.toFixed(2)} until cap (£${dailyCap.toFixed(2)})`;
       }
@@ -2516,15 +2511,10 @@ canvas {
     updateChart();
   }
 
-  // =====================================================
-  // INITIALIZATION
-  // =====================================================
-
   async function initApp() {
     console.log('TFL Journey Tracker - Contactless vs Oyster Comparison Tool');
     console.log('Total stations loaded:', TFL_STATIONS.length);
     
-    // Initialize DOM elements
     authContainer = document.getElementById('authContainer');
     authEmail = document.getElementById('authEmail');
     authPassword = document.getElementById('authPassword');
@@ -2536,7 +2526,6 @@ canvas {
     userMenuGreeting = document.getElementById('userMenuGreeting');
     userMenuUsername = document.getElementById('userMenuUsername');
     
-    // Check for existing session
     if (!currentUser) {
       const { data: { session }, error } = await mySupabaseClient.auth.getSession();
       if (session) {
