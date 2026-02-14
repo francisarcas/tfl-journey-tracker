@@ -800,32 +800,17 @@ button.disabled {
   justify-content: center;
   font-size: 1.1rem;
   flex-shrink: 0;
-  color: white;
+  background: transparent;
+  padding: 4px;
 }
 
-.journey-icon.underground {
-  background: var(--central);
+.journey-icon img {
+  width: 24px;  /* Keep this one - it's 24px for desktop */
+  height: 24px;
+  object-fit: contain;
+  display: block;
 }
 
-.journey-icon.overground {
-  background: var(--overground);
-}
-
-.journey-icon.elizabeth {
-  background: var(--elizabeth);
-}
-
-.journey-icon.tram {
-  background: var(--tram);
-}
-
-.journey-icon.bus {
-  background: var(--bus);
-}
-
-.journey-icon.dlr {
-  background: var(--dlr);
-}
 
 .journey-details {
   flex: 1;
@@ -1044,6 +1029,8 @@ canvas {
   padding: 0 5px;
 }
 
+
+
 /* Mobile Responsive */
 @media (max-width: 600px) {
   .form {
@@ -1064,6 +1051,11 @@ canvas {
   input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     padding: 0;
     margin: 0;
+  }
+
+   .journey-icon img {
+    width: 18px;
+    height: 18px;
   }
   
   .summary-grid {
@@ -1181,6 +1173,12 @@ canvas {
     font-size: 1rem;
     flex-shrink: 0;
     margin: 0;
+    padding: 3px; /* Adjust padding for mobile */
+  }
+
+  .journey-icon img {
+    width: 22px;
+    height: 22px;
   }
   
   .journey-details {
