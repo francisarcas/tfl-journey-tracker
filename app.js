@@ -88,15 +88,16 @@ function getStationZones(stationName) {
 
 function getTransportIcon(transport) {
   const icons = {
-    underground: '<i class="fa-solid fa-train-subway"></i>',
-    overground: '<i class="fa-solid fa-train"></i>',
-    elizabeth: '<i class="fa-solid fa-train-tram"></i>',
-    tram: '<i class="fa-solid fa-train-tram"></i>',
-    bus: '<i class="fa-solid fa-bus"></i>',
-    dlr: '<i class="fa-solid fa-train"></i>'
+    underground: '<img src="assets/logos/underground.png" alt="Underground" style="width: 20px; height: 20px; object-fit: contain;">',
+    overground: '<img src="assets/logos/overground.png" alt="Overground" style="width: 20px; height: 20px; object-fit: contain;">',
+    elizabeth: '<img src="assets/logos/elizabeth.png" alt="Elizabeth Line" style="width: 20px; height: 20px; object-fit: contain;">',
+    tram: '<img src="assets/logos/trams.png" alt="Tram" style="width: 20px; height: 20px; object-fit: contain;">',
+    bus: '<img src="assets/logos/buses.png" alt="Bus" style="width: 20px; height: 20px; object-fit: contain;">',
+    dlr: '<img src="assets/logos/dlr.png" alt="DLR" style="width: 20px; height: 20px; object-fit: contain;">'
   };
-  return icons[transport] || '<i class="fa-solid fa-train"></i>';
+  return icons[transport] || '<img src="assets/logos/underground.png" alt="Transport" style="width: 20px; height: 20px; object-fit: contain;">';
 }
+
 
 function formatDate(dateString) {
   const date = new Date(dateString + 'T00:00:00');
