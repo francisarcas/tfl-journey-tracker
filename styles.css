@@ -1028,6 +1028,7 @@ canvas {
     justify-content: center;
     padding-top: 4%;
     margin-bottom: 6%;
+    gap: 12px
   }
   
   h1 {
