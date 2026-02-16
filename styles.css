@@ -504,6 +504,8 @@ h1 {
   transition: all 0.2s ease;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .carousel-nav:hover {
@@ -611,7 +613,6 @@ h1 {
   width: 50px;
   height: 50px;
   display: flex;
-  margin-top: 15%;
   align-items: center;
   justify-content: center;
   background: rgba(10, 132, 255, 0.1);
@@ -1313,7 +1314,7 @@ button.disabled {
 
 @media (max-width: 600px) {
   .carousel-slide {
-    min-height: 320px;
+    min-height: 360px;
   }
 
   .form {
@@ -1511,51 +1512,62 @@ button.disabled {
     width: 100%;
   }
   
+  /* Mobile Carousel Fixes */
   .stats-carousel {
-    padding: 0 32px;
+    padding: 0 36px;
   }
   
   .carousel-nav {
     width: 32px;
     height: 32px;
     font-size: 0.8rem;
+    -webkit-user-select: none;
+    user-select: none;
   }
   
   .carousel-nav-left {
-    left: 4px;
+    left: 2px;
   }
   
   .carousel-nav-right {
-    right: 4px;
+    right: 2px;
   }
   
   .widget-title {
     font-size: 1rem;
+    margin-bottom: 12px;
   }
   
+  /* Stats List - Vertical alignment on mobile */
   .stats-list {
     grid-template-columns: 1fr;
     gap: 10px;
+    justify-items: center;
   }
 
   .stats-item {
-    flex-direction: row;
-    justify-content: flex-start;
-    padding: 12px;
-    gap: 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 12px;
+    gap: 12px;
+    min-height: 120px;
+    max-width: 280px;
+    width: 100%;
   }
   
   .stats-rank {
     font-size: 1.5rem;
     width: 45px;
     height: 45px;
+    margin-top: 0;
   }
   
   .stats-name {
     font-size: 0.9rem;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    text-align: left;
+    text-align: center;
   }
   
   .stats-value {
@@ -1563,23 +1575,31 @@ button.disabled {
   }
 
   .stats-info {
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
 
+  /* Chart - Horizontal bars on mobile */
   .chart-wrapper {
-    min-height: 240px;
+    min-height: 300px;
+    padding: 10px 0;
   }
 
   .chart-wrapper canvas {
-    max-height: 240px !important;
+    max-height: 300px !important;
   }
   
+  /* Insight Grid - Vertical on mobile with reduced width */
   .insight-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+    justify-items: center;
   }
   
   .insight-card {
     padding: 16px;
+    max-width: 280px;
+    width: 100%;
   }
 
   .insight-content {
@@ -1595,14 +1615,14 @@ button.disabled {
   }
   
   .insight-icon {
-    width: 64px; /* Increased from 56px */
-    height: 64px; /* Increased from 56px */
+    width: 64px;
+    height: 64px;
     padding: 0;
   }
   
   .insight-icon img {
-    width: 64px; /* Increased from 56px */
-    height: 64px; /* Increased from 56px */
+    width: 64px;
+    height: 64px;
   }
 
   .insight-icon i {
