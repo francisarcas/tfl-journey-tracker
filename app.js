@@ -1029,10 +1029,10 @@ function initChart() {
       maintainAspectRatio: false,
       layout: {
         padding: {
-          top: 0,
-          bottom: 0,
-          left: isMobile ? 0 : 0,
-          right: isMobile ? 0 : 0
+          top: 10,
+          bottom: 10,
+          left: isMobile ? 10 : 5,
+          right: isMobile ? 10 : 15 // Adjusted right padding for mobile to allow more space
         }
       },
       plugins: {
@@ -1052,7 +1052,7 @@ function initChart() {
         }
       },
       scales: {
-        x: {
+        x: { // This is the value axis on mobile (horizontal)
           beginAtZero: true,
           grid: {
             display: isMobile ? true : false,
@@ -1061,17 +1061,22 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
-            stepSize: isMobile ? 20 : undefined,
+            // Removed stepSize to let Chart.js auto-determine optimal tick values
             callback: function(value) {
               return isMobile ? '£' + value : this.getLabelForValue(value);
             },
             font: {
               size: isMobile ? 9 : 11
             },
-            padding: isMobile ? 5 : 8
-          }
+            padding: isMobile ? 5 : 8,
+            autoSkip: true,
+            maxTicksLimit: isMobile ? 6 : 10,
+            maxRotation: isMobile ? 0 : 0,
+            minRotation: 0,
+          },
+          // Removed suggestedMax to avoid constraining the chart height/width
         },
-        y: {
+        y: { // This is the label axis (months) on mobile (vertical)
           beginAtZero: true,
           grid: {
             display: isMobile ? false : true,
@@ -1080,14 +1085,17 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
-            stepSize: isMobile ? undefined : 20,
+            // Removed stepSize
             callback: function(value) {
               return isMobile ? this.getLabelForValue(value) : '£' + value;
             },
             font: {
               size: isMobile ? 9 : 11
             },
-            padding: isMobile ? 5 : 8
+            padding: isMobile ? 5 : 8,
+            autoSkip: false, // <-- FIX: Ensure all month labels are shown
+            maxRotation: 0,
+            minRotation: 0,
           },
           suggestedMax: isMobile ? undefined : 100
         }
@@ -1222,6 +1230,12 @@ function goToSlide(index) {
   dots.forEach((dot, i) => {
     dot.classList.toggle('active', i === currentSlide);
   });
+  // Fix: Resize chart when showing slide 0 (chart slide)
+  if (index === 0 && spendingChart) {
+    setTimeout(() => {
+      spendingChart.resize();
+    }, 100);  // Small delay for transition
+  }
 }
 
 // =====================================================
@@ -1446,7 +1460,7 @@ async function initApp() {
   if (currentUser && loggedInUserProfile) {
     await loadUserSettings();
     await fetchJourneysFromSupabase();
-    
+
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1454,19 +1468,25 @@ async function initApp() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
-    
+
     initChart();
+
+    // ── This is the line you just added ──
+    window.addEventListener('resize', () => {
+      if (spendingChart) {
+        spendingChart.resize();  // Fix: Resize on window change
+      }
+    });
+
     initCarousel();
-    
+
     document.getElementById('transportInput').addEventListener('change', handleTransportChange);
     document.getElementById('homeZoneSelect').addEventListener('change', updateTravelcardCostDisplay);
-    
     setupStationAutocomplete('originInput', 'originSuggestions');
     setupStationAutocomplete('destinationInput', 'destinationSuggestions');
     setupAutoPriceCalculation();
-    
     updateAll();
-  }
+}
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
