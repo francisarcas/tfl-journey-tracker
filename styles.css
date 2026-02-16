@@ -563,7 +563,7 @@ h1 {
    ===================================================== */
 
 .stats-widget {
-  padding: 8px 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -684,14 +684,15 @@ h1 {
   width: 100%;
   height: 100%;
   min-height: 280px;
+  max-height: 280px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   padding: 0;
+  position: relative;
 }
 
 .chart-wrapper canvas {
-  max-height: 280px !important;
   width: 100% !important;
   height: 100% !important;
 }
@@ -1521,12 +1522,13 @@ button.disabled {
   
   /* Mobile Carousel Fixes */
   .stats-carousel {
-    padding: 0 32px;
+    padding: 0 30px;
   }
 
   .carousel-container {
     width: 100%;
     margin: 0;
+    overflow: visible;
   }
 
   .carousel-track {
@@ -1537,22 +1539,24 @@ button.disabled {
   .carousel-slide {
     padding: 0;
     min-height: 340px;
+    display: flex;
+    align-items: stretch;
   }
   
   .carousel-nav {
-    width: 28px;
-    height: 28px;
-    font-size: 0.75rem;
+    width: 26px;
+    height: 26px;
+    font-size: 0.7rem;
     -webkit-user-select: none;
     user-select: none;
   }
   
   .carousel-nav-left {
-    left: 0;
+    left: 2px;
   }
   
   .carousel-nav-right {
-    right: 0;
+    right: 2px;
   }
   
   .widget-title {
@@ -1560,11 +1564,17 @@ button.disabled {
     margin-bottom: 12px;
   }
   
+  .stats-widget {
+    padding: 0;
+    width: 100%;
+  }
+  
   /* Stats List - Vertical alignment on mobile */
   .stats-list {
     grid-template-columns: 1fr;
     gap: 10px;
     justify-items: center;
+    width: 100%;
   }
 
   .stats-item {
@@ -1574,7 +1584,7 @@ button.disabled {
     padding: 14px 10px;
     gap: 10px;
     min-height: 110px;
-    max-width: 260px;
+    max-width: 100%;
     width: 100%;
   }
   
@@ -1603,32 +1613,33 @@ button.disabled {
 
   /* Chart - Full height on mobile */
   .chart-wrapper {
-    min-height: 320px;
-    max-height: 320px;
-    height: 320px;
-    padding: 0;
     width: 100%;
+    min-height: 340px;
+    max-height: 340px;
+    height: 340px;
+    padding: 0;
     display: flex;
     align-items: stretch;
+    justify-content: center;
+    position: relative;
   }
 
   .chart-wrapper canvas {
-    min-height: 320px !important;
-    max-height: 320px !important;
-    height: 320px !important;
     width: 100% !important;
+    height: 100% !important;
   }
   
-  /* Insight Grid - Vertical on mobile with reduced width */
+  /* Insight Grid - Vertical on mobile */
   .insight-grid {
     grid-template-columns: 1fr;
     gap: 10px;
     justify-items: center;
+    width: 100%;
   }
   
   .insight-card {
     padding: 14px;
-    max-width: 260px;
+    max-width: 100%;
     width: 100%;
   }
 
