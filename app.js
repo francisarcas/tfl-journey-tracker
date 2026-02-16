@@ -1009,6 +1009,8 @@ let spendingChart;
 
 function initChart() {
   const ctx = document.getElementById('spendingChart');
+  const isMobile = window.innerWidth <= 600;
+  
   spendingChart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -1022,6 +1024,7 @@ function initChart() {
       }]
     },
     options: {
+      indexAxis: isMobile ? 'y' : 'x', // Horizontal on mobile
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -1056,7 +1059,7 @@ function initChart() {
           ticks: {
             color: '#f5f5f7',
             callback: function(value) {
-              return '£' + value;
+              return isMobile ? value : '£' + value;
             }
           }
         }
@@ -1064,6 +1067,7 @@ function initChart() {
     }
   });
 }
+
 
 function updateChart() {
   const yearJourneys = journeys.filter(j => j.date.startsWith(activeYear.toString()));
