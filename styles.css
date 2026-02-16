@@ -616,7 +616,7 @@ h1 {
   border-radius: 12px;
   transition: all 0.2s ease;
   text-align: center;
-  min-height: 140px;
+  min-height: 120px;
 }
 
 .stats-item:hover {
@@ -753,7 +753,7 @@ h1 {
 }
 
 .insight-icon {
-  width: 80px;
+  width: 80px; /* Container size for desktop */
   height: 80px;
   display: flex;
   align-items: center;
@@ -764,14 +764,16 @@ h1 {
   flex-shrink: 0;
 }
 
+/* FIX: Make favorite transport icon bigger for desktop */
 .insight-icon img {
-  width: 80px;
-  height: 80px;
+  width: 60px; /* Increased size */
+  height: 60px; /* Increased size */
   object-fit: contain;
+  display: block;
 }
 
 .insight-icon i {
-  font-size: 40px;
+  font-size: 60px; /* Increased size for Font Awesome icons */
   color: var(--accent1);
 }
 
@@ -1388,10 +1390,6 @@ button.disabled {
     pointer-events: none;
   }
   
-  #userMenuToggle::before {
-    width: 170px;
-  }
-  
   #userMenuToggle:checked {
     width: 190px;
   }
@@ -1530,14 +1528,11 @@ button.disabled {
     width: 100%;
   }
   
-  /* Mobile Carousel Fixes (REVISED) */
+  /* Mobile Carousel Fixes (REVISED AGAIN) */
   .stats-carousel {
-    padding: 0; /* FIX: Remove padding entirely for mobile to maximize chart width */
+    padding: 0 10px; /* FIX: Re-added padding to prevent nav buttons from overlapping content */
   }
 
-  /* .carousel-container, .carousel-track, .carousel-slide will inherit flex properties from desktop */
-  /* and their width/height will adjust due to flex: 0 0 100% and overflow: hidden */
-  
   .carousel-slide {
     min-height: 340px; /* Override desktop min-height for mobile */
   }
@@ -1563,7 +1558,7 @@ button.disabled {
   }
   
   .stats-widget {
-    padding: 0;
+    padding: 0 10px; /* FIX: Added padding to stats widgets on mobile to reduce content width */
     width: 100%;
   }
   
@@ -1581,8 +1576,7 @@ button.disabled {
     align-items: center;
     padding: 14px 10px;
     gap: 10px;
-    min-height: 110px;
-    max-width: 100%;
+    max-width: 80%;
     width: 100%;
   }
   
@@ -1612,10 +1606,10 @@ button.disabled {
   /* Chart - Full height on mobile */
   .chart-wrapper {
     width: 100%;
-    min-height: 340px !important;
-    max-height: 340px !important;
-    height: 340px !important;  /* Force full height */
-    padding: 0; /* Ensure no internal padding */
+    min-height: 340px; /* FIX: Removed !important, relying on flex grow */
+    max-height: none;   /* FIX: Removed max-height to allow growth */
+    height: 100%;       /* FIX: Allow to take full height of parent */
+    padding: 0; 
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -1623,7 +1617,7 @@ button.disabled {
   }
 
   .chart-wrapper canvas {
-    width: 100% !important;
+    width: 80% !important;
     height: 100% !important;
   }
   
@@ -1637,7 +1631,7 @@ button.disabled {
   
   .insight-card {
     padding: 14px;
-    max-width: 100%;
+    max-width: 80%;
     width: 100%;
   }
 
@@ -1654,17 +1648,17 @@ button.disabled {
   }
   
   .insight-icon {
-    width: 56px;
-    height: 56px;
+    width: 60px; /* Adjusted container size for mobile icon */
+    height: 60px;
     padding: 0;
   }
   
   .insight-icon img {
-    width: 56px;
-    height: 56px;
+    width: 48px; /* Adjusted icon size for mobile */
+    height: 48px;
   }
 
   .insight-icon i {
-    font-size: 28px;
+    font-size: 48px; /* Adjusted icon size for mobile */
   }
 }
