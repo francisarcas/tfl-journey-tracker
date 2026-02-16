@@ -467,19 +467,21 @@ h1 {
 .carousel-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
+  width: 300%;  /* Fix: Allow space for all 3 slides */
   position: relative;
   left: 0;
 }
 
 .carousel-slide {
-  min-width: 100%;
-  flex-shrink: 0;
+  width: 33.333%;
+  flex: 0 0 33.333%;
   opacity: 0;
   transition: opacity 0.4s ease;
   min-height: 280px;
-  display: flex;
-  align-items: stretch;
+  display: flex; /* Already present, but making sure */
+  flex-direction: column; /* <-- FIX: Ensure children stack and stretch vertically */
+  justify-content: stretch; /* <-- FIX: Stretch children vertically */
+  align-items: stretch; /* <-- FIX: Stretch children horizontally */
   padding: 0;
 }
 
@@ -498,14 +500,14 @@ h1 {
   background: var(--interactive-bg);
   border: none;
   color: var(--text);
-  width: 36px;
-  height: 36px;
+  width: 40px;  /* Fix: Slightly larger for better circle */
+  height: 40px;
+  font-size: 1rem;  /* Fix: Bigger icon to fit perfectly */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: all 0.2s ease;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -1321,9 +1323,6 @@ button.disabled {
    ===================================================== */
 
 @media (max-width: 600px) {
-  .carousel-slide {
-    min-height: 340px;
-  }
 
   .form {
     grid-template-columns: 1fr;
@@ -1532,7 +1531,7 @@ button.disabled {
   }
 
   .carousel-track {
-    width: 100%;
+    width: 300%;
     left: 0;
   }
 
@@ -1541,15 +1540,18 @@ button.disabled {
     min-height: 340px;
     display: flex;
     align-items: stretch;
+    width: 33.333%;
+  flex: 0 0 33.333%;
   }
   
   .carousel-nav {
-    width: 26px;
-    height: 26px;
-    font-size: 0.7rem;
-    -webkit-user-select: none;
-    user-select: none;
-  }
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+  border-radius: 50%; /* <-- FIX: Explicitly ensure it's rounded on mobile */
+  -webkit-user-select: none;
+  user-select: none;
+}
   
   .carousel-nav-left {
     left: 2px;
@@ -1614,9 +1616,9 @@ button.disabled {
   /* Chart - Full height on mobile */
   .chart-wrapper {
     width: 100%;
-    min-height: 340px;
-    max-height: 340px;
-    height: 340px;
+    min-height: 340px !important;
+    max-height: 340px !important;
+    height: 340px !important;  /* Fix: Force full height */
     padding: 0;
     display: flex;
     align-items: stretch;
