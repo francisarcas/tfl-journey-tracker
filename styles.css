@@ -455,21 +455,21 @@ h1 {
   position: relative;
   overflow: hidden;
   padding: 0 40px;
-  width: 100%; /* Ensure full width */
+  width: 100%;
 }
 
 .carousel-container {
   overflow: hidden;
   width: 100%;
-  position: relative; /* Add this */
+  position: relative;
 }
 
 .carousel-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
-  position: relative; /* Add this */
-  left: 0; /* Add this */
+  position: relative;
+  left: 0;
 }
 
 .carousel-slide {
@@ -480,7 +480,7 @@ h1 {
   min-height: 280px;
   display: flex;
   align-items: stretch;
-  padding: 0; /* Ensure no extra padding */
+  padding: 0;
 }
 
 .carousel-slide.active {
@@ -687,13 +687,13 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0; /* Remove padding that might reduce available height */
+  padding: 0;
 }
 
 .chart-wrapper canvas {
   max-height: 280px !important;
   width: 100% !important;
-  height: 100% !important; /* Add this */
+  height: 100% !important;
 }
 
 /* Insight Grid */
@@ -1321,7 +1321,7 @@ button.disabled {
 
 @media (max-width: 600px) {
   .carousel-slide {
-    min-height: 360px;
+    min-height: 340px;
   }
 
   .form {
@@ -1519,39 +1519,40 @@ button.disabled {
     width: 100%;
   }
   
+  /* Mobile Carousel Fixes */
   .stats-carousel {
-    padding: 0 36px;
-    width: 100%; /* Ensure full width */
+    padding: 0 32px;
   }
 
   .carousel-container {
     width: 100%;
-    margin: 0; /* Remove any margin */
+    margin: 0;
   }
 
   .carousel-track {
     width: 100%;
-    left: 0; /* Ensure it starts from the left */
+    left: 0;
   }
 
   .carousel-slide {
-    padding: 0; /* Remove any padding that might shift content */
+    padding: 0;
+    min-height: 340px;
   }
   
   .carousel-nav {
-    width: 32px;
-    height: 32px;
-    font-size: 0.8rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
     -webkit-user-select: none;
     user-select: none;
   }
   
   .carousel-nav-left {
-    left: 2px;
+    left: 0;
   }
   
   .carousel-nav-right {
-    right: 2px;
+    right: 0;
   }
   
   .widget-title {
@@ -1570,29 +1571,29 @@ button.disabled {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 16px 12px;
-    gap: 12px;
-    min-height: 120px;
-    max-width: 280px;
+    padding: 14px 10px;
+    gap: 10px;
+    min-height: 110px;
+    max-width: 260px;
     width: 100%;
   }
   
   .stats-rank {
-    font-size: 1.5rem;
-    width: 45px;
-    height: 45px;
+    font-size: 1.4rem;
+    width: 42px;
+    height: 42px;
     margin-top: 0;
   }
   
   .stats-name {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
   
   .stats-value {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 
   .stats-info {
@@ -1600,32 +1601,39 @@ button.disabled {
     text-align: center;
   }
 
+  /* Chart - Full height on mobile */
   .chart-wrapper {
-    min-height: 300px;
-    padding: 10px 0;
-    width: 100%; /* Ensure full width */
+    min-height: 320px;
+    max-height: 320px;
+    height: 320px;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    align-items: stretch;
   }
 
   .chart-wrapper canvas {
-    max-height: 300px !important;
-    width: 100% !important; /* Ensure canvas uses full width */
+    min-height: 320px !important;
+    max-height: 320px !important;
+    height: 320px !important;
+    width: 100% !important;
   }
   
   /* Insight Grid - Vertical on mobile with reduced width */
   .insight-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
     justify-items: center;
   }
   
   .insight-card {
-    padding: 16px;
-    max-width: 280px;
+    padding: 14px;
+    max-width: 260px;
     width: 100%;
   }
 
   .insight-content {
-    gap: 12px;
+    gap: 10px;
   }
 
   .insight-text {
@@ -1633,21 +1641,21 @@ button.disabled {
   }
   
   .insight-value {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
   
   .insight-icon {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     padding: 0;
   }
   
   .insight-icon img {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
   }
 
   .insight-icon i {
-    font-size: 32px;
+    font-size: 28px;
   }
 }
