@@ -1093,12 +1093,12 @@ canvas {
   }
   
   #userMenuToggle {
-    width: 160px;
+    width: 170px;
     pointer-events: none; /* Keep this */
   }
   
   #userMenuToggle::before {
-    width: 160px;
+    width: 170px;
   }
   
   #userMenuToggle:checked {
