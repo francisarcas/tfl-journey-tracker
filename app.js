@@ -98,7 +98,6 @@ function getTransportIcon(transport) {
   return icons[transport] || '<img src="assets/logos/underground.png" alt="Transport" style="width: 20px; height: 20px; object-fit: contain;">';
 }
 
-
 function formatDate(dateString) {
   const date = new Date(dateString + 'T00:00:00');
   const today = new Date();
@@ -1112,6 +1111,241 @@ function updateChart() {
 }
 
 // =====================================================
+// CAROUSEL FUNCTIONS
+// =====================================================
+
+let currentSlide = 0;
+const totalSlides = 3;
+
+function initCarousel() {
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  const dots = document.querySelectorAll('.carousel-dot');
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => navigateCarousel(-1));
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => navigateCarousel(1));
+  }
+  
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => goToSlide(index));
+  });
+  
+  // Touch/swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const track = document.getElementById('carouselTrack');
+  
+  if (track) {
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+  }
+  
+  function handleSwipe() {
+    if (touchEndX < touchStartX - 50) {
+      navigateCarousel(1); // Swipe left
+    }
+    if (touchEndX > touchStartX + 50) {
+      navigateCarousel(-1); // Swipe right
+    }
+  }
+}
+
+function navigateCarousel(direction) {
+  currentSlide += direction;
+  
+  if (currentSlide < 0) {
+    currentSlide = totalSlides - 1;
+  } else if (currentSlide >= totalSlides) {
+    currentSlide = 0;
+  }
+  
+  goToSlide(currentSlide);
+}
+
+function goToSlide(index) {
+  currentSlide = index;
+  const track = document.getElementById('carouselTrack');
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.carousel-dot');
+  
+  // Update transform
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  
+  // Update active states
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === currentSlide);
+  });
+  
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentSlide);
+  });
+}
+
+// =====================================================
+// STATS CALCULATION FUNCTIONS
+// =====================================================
+
+function calculateTopStations() {
+  const monthJourneys = journeys.filter(j => j.month === activeMonth);
+  
+  if (monthJourneys.length === 0) {
+    return [];
+  }
+  
+  const stationCounts = {};
+  
+  monthJourneys.forEach(journey => {
+    // Count origin
+    if (journey.origin) {
+      stationCounts[journey.origin] = (stationCounts[journey.origin] || 0) + 1;
+    }
+    // Count destination (if not bus)
+    if (journey.destination && journey.transport !== 'bus') {
+      stationCounts[journey.destination] = (stationCounts[journey.destination] || 0) + 1;
+    }
+  });
+  
+  // Convert to array and sort
+  const sortedStations = Object.entries(stationCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+  
+  return sortedStations;
+}
+
+function calculateBusiestWeek() {
+  const monthJourneys = journeys.filter(j => j.month === activeMonth);
+  
+  if (monthJourneys.length === 0) {
+    return { weekStart: null, count: 0 };
+  }
+  
+  const weekCounts = {};
+  
+  monthJourneys.forEach(journey => {
+    const date = new Date(journey.date + 'T00:00:00');
+    // Get Monday of the week
+    const dayOfWeek = date.getDay();
+    const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const monday = new Date(date.setDate(diff));
+    const weekKey = monday.toISOString().split('T')[0];
+    
+    weekCounts[weekKey] = (weekCounts[weekKey] || 0) + 1;
+  });
+  
+  let busiestWeek = { weekStart: null, count: 0 };
+  
+  Object.entries(weekCounts).forEach(([weekStart, count]) => {
+    if (count > busiestWeek.count) {
+      busiestWeek = { weekStart, count };
+    }
+  });
+  
+  return busiestWeek;
+}
+
+function calculateFavoriteTransport() {
+  const monthJourneys = journeys.filter(j => j.month === activeMonth);
+  
+  if (monthJourneys.length === 0) {
+    return { transport: 'underground', count: 0 };
+  }
+  
+  const transportCounts = {};
+  
+  monthJourneys.forEach(journey => {
+    transportCounts[journey.transport] = (transportCounts[journey.transport] || 0) + 1;
+  });
+  
+  let favorite = { transport: 'underground', count: 0 };
+  
+  Object.entries(transportCounts).forEach(([transport, count]) => {
+    if (count > favorite.count) {
+      favorite = { transport, count };
+    }
+  });
+  
+  return favorite;
+}
+
+function updateStatsWidgets() {
+  // Update Top Stations
+  const topStations = calculateTopStations();
+  const topStationsList = document.getElementById('topStationsList');
+  
+  if (topStations.length === 0) {
+    topStationsList.innerHTML = `
+      <div class="stats-item">
+        <div class="stats-rank">-</div>
+        <div class="stats-info">
+          <div class="stats-name">No data yet</div>
+          <div class="stats-value">Start tracking to see stats</div>
+        </div>
+      </div>
+    `;
+  } else {
+    topStationsList.innerHTML = topStations.map((station, index) => {
+      const stationData = getStationData(station.name);
+      const lineBadges = stationData ? stationData.lines.map(line => 
+        `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
+      ).join('') : '';
+      
+      return `
+        <div class="stats-item">
+          <div class="stats-rank">${index + 1}</div>
+          <div class="stats-info">
+            <div class="stats-name">
+              ${station.name}
+              ${lineBadges ? `<span class="line-indicators">${lineBadges}</span>` : ''}
+            </div>
+            <div class="stats-value">${station.count} visit${station.count !== 1 ? 's' : ''}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  // Update Busiest Week
+  const busiestWeek = calculateBusiestWeek();
+  const busiestWeekEl = document.getElementById('busiestWeek');
+  const busiestWeekJourneysEl = document.getElementById('busiestWeekJourneys');
+  
+  if (busiestWeek.weekStart) {
+    const weekDate = new Date(busiestWeek.weekStart + 'T00:00:00');
+    const options = { day: 'numeric', month: 'short' };
+    const weekEnd = new Date(weekDate);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    
+    busiestWeekEl.textContent = `${weekDate.toLocaleDateString('en-GB', options)} - ${weekEnd.toLocaleDateString('en-GB', options)}`;
+    busiestWeekJourneysEl.textContent = `${busiestWeek.count} journey${busiestWeek.count !== 1 ? 's' : ''}`;
+  } else {
+    busiestWeekEl.textContent = 'No data';
+    busiestWeekJourneysEl.textContent = '0 journeys';
+  }
+  
+  // Update Favorite Transport
+  const favoriteTransport = calculateFavoriteTransport();
+  const favoriteTransportIconEl = document.getElementById('favoriteTransportIcon');
+  const favoriteTransportNameEl = document.getElementById('favoriteTransportName');
+  const favoriteTransportCountEl = document.getElementById('favoriteTransportCount');
+
+  favoriteTransportIconEl.innerHTML = getTransportIcon(favoriteTransport.transport);
+  favoriteTransportNameEl.textContent = capitalizeLineName(favoriteTransport.transport);
+  favoriteTransportCountEl.textContent = `${favoriteTransport.count} journey${favoriteTransport.count !== 1 ? 's' : ''}`;
+}
+
+// =====================================================
 // MAIN UPDATE FUNCTION
 // =====================================================
 
@@ -1121,6 +1355,7 @@ function updateAll() {
   renderJourneys();
   updateSummary();
   updateChart();
+  updateStatsWidgets();
 }
 
 // =====================================================
@@ -1188,6 +1423,7 @@ async function initApp() {
     document.getElementById('dateTimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
     
     initChart();
+    initCarousel();
     
     document.getElementById('transportInput').addEventListener('change', handleTransportChange);
     document.getElementById('homeZoneSelect').addEventListener('change', updateTravelcardCostDisplay);
