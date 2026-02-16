@@ -89,12 +89,12 @@ function getStationZones(stationName) {
 
 function getTransportIcon(transport) {
   const icons = {
-    underground: '<img src="assets/logos/underground.png" alt="Underground" style="width: 20px; height: 20px; object-fit: contain;">',
-    overground: '<img src="assets/logos/overground.png" alt="Overground" style="width: 20px; height: 20px; object-fit: contain;">',
-    elizabeth: '<img src="assets/logos/elizabeth.png" alt="Elizabeth Line" style="width: 20px; height: 20px; object-fit: contain;">',
-    tram: '<img src="assets/logos/trams.png" alt="Tram" style="width: 20px; height: 20px; object-fit: contain;">',
-    bus: '<img src="assets/logos/buses.png" alt="Bus" style="width: 20px; height: 20px; object-fit: contain;">',
-    dlr: '<img src="assets/logos/dlr.png" alt="DLR" style="width: 20px; height: 20px; object-fit: contain;">'
+    underground: '<img src="assets/logos/underground.png" alt="Underground">',
+    overground: '<img src="assets/logos/overground.png" alt="Overground">',
+    elizabeth: '<img src="assets/logos/elizabeth.png" alt="Elizabeth Line">',
+    tram: '<img src="assets/logos/trams.png" alt="Tram">',
+    bus: '<img src="assets/logos/buses.png" alt="Bus">',
+    dlr: '<img src="assets/logos/dlr.png" alt="DLR">'
   };
   return icons[transport] || '<img src="assets/logos/underground.png" alt="Transport" style="width: 20px; height: 20px; object-fit: contain;">';
 }
@@ -1070,6 +1070,7 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
+            stepSize: isMobile ? 20 : undefined,
             callback: function(value) {
               return isMobile ? '£' + value : this.getLabelForValue(value);
             },
@@ -1092,6 +1093,7 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
+            stepSize: isMobile ? undefined : 20,
             callback: function(value) {
               return isMobile ? this.getLabelForValue(value) : '£' + value;
             },
