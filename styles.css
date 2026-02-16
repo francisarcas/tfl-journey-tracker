@@ -111,22 +111,6 @@ h1 {
   position: absolute;
   top: 0;
   left: 0;
-  pointer-events: none; /* ADD THIS - Makes checkbox not capture clicks */
-}
-
-#userMenuToggle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 180px;
-  height: 100%;
-  pointer-events: auto; /* This area captures clicks */
-  z-index: 1;
-}
-
-#userMenuToggle:checked::before {
-  width: 180px; /* Keep same width when expanded */
 }
 
 .menu-content {
@@ -177,7 +161,6 @@ h1 {
   text-overflow: ellipsis;
 }
 
-
 .logout-area {
   width: 0;
   height: 100%;
@@ -189,13 +172,10 @@ h1 {
   overflow: hidden;
   transition: width 0.4s ease;
   flex-shrink: 0;
-  position: relative;
-  z-index: 1000; /* ADD THIS - Ensures it's above the checkbox */
 }
 
 #userMenuToggle:checked ~ .menu-content .logout-area {
   width: 40px;
-  pointer-events: auto; /* ADD THIS - Makes logout area clickable */
 }
 
 .logout-area:hover {
@@ -214,11 +194,7 @@ h1 {
   align-items: center;
   justify-content: center;
   padding: 0;
-  position: relative;
-  z-index: 1001; /* ADD THIS - Ensures button is above everything */
-  pointer-events: auto; /* ADD THIS - Makes button clickable */
 }
-
 
 .settings-btn {
   background: var(--card);
@@ -411,7 +387,6 @@ h1 {
   opacity: 1;
 }
 
-
 /* Main cyan curve */
 .summary-card.monthly-spend::after {
   content: "";
@@ -499,7 +474,6 @@ h1 {
   background: var(--danger-border);
   font-weight: 600;
 }
-
 
 /* Journey Form */
 .form {
@@ -603,7 +577,6 @@ button.disabled {
   font-size: 0.75rem;
 }
 
-
 /* Station Input with Autocomplete */
 .station-input-wrapper {
   position: relative;
@@ -673,52 +646,42 @@ button.disabled {
 
 .line-badge.victoria {
   background: var(--victoria);
-  
 }
 
 .line-badge.central {
   background: var(--central);
-  
 }
 
 .line-badge.piccadilly {
   background: var(--piccadilly);
-  
 }
 
 .line-badge.district {
   background: var(--district);
-  
 }
 
 .line-badge.circle {
   background: var(--circle);
-  
 }
 
 .line-badge.metropolitan {
   background: var(--metropolitan);
-  
 }
 
 .line-badge.hammersmith {
   background: var(--hammersmith);
-  
 }
 
 .line-badge.bakerloo {
   background: var(--bakerloo);
-  
 }
 
 .line-badge.jubilee {
   background: var(--jubilee);
-  
 }
 
 .line-badge.waterloo {
   background: var(--waterloo);
-  
 }
 
 .line-badge.elizabeth {
@@ -794,6 +757,7 @@ button.disabled {
 .journey-icon {
   width: 32px;
   height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -804,12 +768,11 @@ button.disabled {
 }
 
 .journey-icon img {
-  width: 24px;  /* Keep this one - it's 24px for desktop */
+  width: 24px;
   height: 24px;
   object-fit: contain;
   display: block;
 }
-
 
 .journey-details {
   flex: 1;
@@ -1028,19 +991,31 @@ canvas {
   padding: 0 5px;
 }
 
-
-
 /* Mobile Responsive */
 @media (max-width: 600px) {
   .form {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+  
   .form-group {
     width: 100%;
   }
+  
+  .form input[type="datetime-local"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
 
-   .journey-icon img {
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    padding: 0;
+    margin: 0;
+  }
+
+  .journey-icon img {
     width: 18px;
     height: 18px;
   }
@@ -1070,30 +1045,27 @@ canvas {
   #user-menu {
     height: 40px;
     border-radius: 20px;
-    margin-right: 20px;
+    margin: 10px auto;
+    overflow: hidden;
   }
   
   .menu-content {
     height: 40px;
-    min-width: 170px;
-    max-width: 180px;
+    width: fit-content;
+    min-width: 160px;
+    max-width: 170px;
+    padding: 0 12px 0 0;
+    transition: max-width 0.4s ease, padding 0.4s ease;
+    overflow: hidden;
   }
   
   #userMenuToggle {
     width: 170px;
-    pointer-events: none;
   }
   
-  #userMenuToggle::before {
-    width: 170px;
-  }
-  
-  #userMenuToggle:checked {
-    width: 190px;
-  }
-  
-  #userMenuToggle:checked::before {
-    width: 150px; /* Don't cover the logout area */
+  #userMenuToggle:checked ~ .menu-content {
+    max-width: 200px;
+    padding-right: 0;
   }
   
   .avatar {
@@ -1108,14 +1080,26 @@ canvas {
   
   .username {
     font-size: 0.9rem;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .logout-area {
     width: 0;
+    opacity: 0;
+    transition: width 0.4s ease, opacity 0.3s ease 0.1s;
+    pointer-events: none;
   }
   
   #userMenuToggle:checked ~ .menu-content .logout-area {
     width: 36px;
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .logout-btn {
+    font-size: 1.1rem;
   }
   
   /* Mobile-specific curve adjustments for monthly-spend card */
@@ -1160,7 +1144,7 @@ canvas {
     font-size: 1rem;
     flex-shrink: 0;
     margin: 0;
-    padding: 3px; /* Adjust padding for mobile */
+    padding: 3px;
   }
 
   .journey-icon img {
