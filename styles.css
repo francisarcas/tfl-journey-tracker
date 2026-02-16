@@ -448,51 +448,61 @@ h1 {
 }
 
 /* =====================================================
-   CAROUSEL STYLES
+   CAROUSEL STYLES (REVISED)
    ===================================================== */
 
 .stats-carousel {
   position: relative;
-  overflow: hidden;
-  padding: 0 40px;
+  overflow: hidden; /* This is key for hiding non-active slides */
+  padding: 0 40px; /* Keep a small padding on desktop for aesthetics */
   width: 100%;
+  box-sizing: border-box; /* Ensure padding doesn't add to width */
 }
 
 .carousel-container {
-  overflow: hidden;
+  overflow: hidden; /* This is key for hiding non-active slides */
   width: 100%;
   position: relative;
+  /* Flexbox properties to ensure content fills available space */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch; /* Stretch children vertically */
+  flex-shrink: 0; /* Prevent container from shrinking unexpectedly */
+  min-width: 0;   /* Prevent container from shrinking unexpectedly */
 }
 
 .carousel-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 300%;  /* Fix: Allow space for all 3 slides */
+  /* The track needs to be as wide as all slides combined */
+  width: 100%; /* Base width, JS will handle actual transform */
   position: relative;
   left: 0;
+  /* Ensure content within track doesn't wrap */
+  white-space: nowrap;
 }
 
 .carousel-slide {
-  width: 33.333%;
-  flex: 0 0 33.333%;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  min-height: 280px;
-  display: flex; /* Already present, but making sure */
-  flex-direction: column; /* <-- FIX: Ensure children stack and stretch vertically */
-  justify-content: stretch; /* <-- FIX: Stretch children vertically */
-  align-items: stretch; /* <-- FIX: Stretch children horizontally */
-  padding: 0;
-}
-
-.carousel-slide.active {
-  opacity: 1;
+  /* Each slide should take up 100% of the carousel-container's width */
+  flex: 0 0 100%; /* Crucial: Don't grow, don't shrink, base width 100% */
+  width: 100%; /* Fallback for older browsers, but flex-basis is primary */
+  box-sizing: border-box;
+  min-height: 280px; /* Maintain minimum height */
+  display: flex;
+  flex-direction: column; /* Allow content inside slide to stack */
+  justify-content: stretch; /* Stretch content inside slide vertically */
+  align-items: stretch; /* Stretch content inside slide horizontally */
+  padding: 0; /* No internal padding on the slide itself */
+  
+  /* REMOVE any opacity or display: none; rules here. All slides should be rendered. */
+  /* Their visibility is controlled by carousel-container's overflow and carousel-track's transform. */
 }
 
 .carousel-slide > * {
   width: 100%;
 }
 
+/* Navigation Buttons */
 .carousel-nav {
   position: absolute;
   top: 50%;
@@ -500,15 +510,15 @@ h1 {
   background: var(--interactive-bg);
   border: none;
   color: var(--text);
-  width: 40px;  /* Fix: Slightly larger for better circle */
+  width: 40px;
   height: 40px;
-  font-size: 1rem;  /* Fix: Bigger icon to fit perfectly */
-  border-radius: 50%;
+  font-size: 1rem;
+  border-radius: 50%; /* Ensure perfectly round */
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   -webkit-tap-highlight-color: transparent;
@@ -532,6 +542,7 @@ h1 {
   right: 8px;
 }
 
+/* Indicators (dots) */
 .carousel-indicators {
   display: flex;
   justify-content: center;
@@ -1519,39 +1530,24 @@ button.disabled {
     width: 100%;
   }
   
-  /* Mobile Carousel Fixes */
+  /* Mobile Carousel Fixes (REVISED) */
   .stats-carousel {
-    padding: 0 30px;
+    padding: 0; /* FIX: Remove padding entirely for mobile to maximize chart width */
   }
 
-  .carousel-container {
-    width: 100%;
-    margin: 0;
-    overflow: visible;
-  }
-
-  .carousel-track {
-    width: 300%;
-    left: 0;
-  }
-
-  .carousel-slide {
-    padding: 0;
-    min-height: 340px;
-    display: flex;
-    align-items: stretch;
-    width: 33.333%;
-  flex: 0 0 33.333%;
-  }
+  /* .carousel-container, .carousel-track, .carousel-slide will inherit flex properties from desktop */
+  /* and their width/height will adjust due to flex: 0 0 100% and overflow: hidden */
   
+  .carousel-slide {
+    min-height: 340px; /* Override desktop min-height for mobile */
+  }
+
   .carousel-nav {
-  width: 32px;
-  height: 32px;
-  font-size: 0.9rem;
-  border-radius: 50%; /* <-- FIX: Explicitly ensure it's rounded on mobile */
-  -webkit-user-select: none;
-  user-select: none;
-}
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-radius: 50%; /* Ensure perfectly rounded on mobile */
+  }
   
   .carousel-nav-left {
     left: 2px;
@@ -1618,8 +1614,8 @@ button.disabled {
     width: 100%;
     min-height: 340px !important;
     max-height: 340px !important;
-    height: 340px !important;  /* Fix: Force full height */
-    padding: 0;
+    height: 340px !important;  /* Force full height */
+    padding: 0; /* Ensure no internal padding */
     display: flex;
     align-items: stretch;
     justify-content: center;
