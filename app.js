@@ -1014,7 +1014,7 @@ function initChart() {
   spendingChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: MONTHS, // This uses the month names array
+      labels: MONTHS, // ['JAN', 'FEB', 'MAR', ...]
       datasets: [{
         label: 'Monthly Spend',
         data: new Array(12).fill(0),
@@ -1024,15 +1024,15 @@ function initChart() {
       }]
     },
     options: {
-      indexAxis: isMobile ? 'y' : 'x', // Horizontal bars on mobile
+      indexAxis: isMobile ? 'y' : 'x',
       responsive: true,
       maintainAspectRatio: false,
       layout: {
         padding: {
-          top: 5,
-          bottom: 5,
-          left: isMobile ? 10 : 5,
-          right: isMobile ? 10 : 5
+          top: 0,
+          bottom: 0,
+          left: isMobile ? 0 : 0,
+          right: isMobile ? 0 : 0
         }
       },
       plugins: {
@@ -1056,35 +1056,38 @@ function initChart() {
           beginAtZero: true,
           grid: {
             display: isMobile ? true : false,
-            color: '#2a2a31'
+            color: '#2a2a31',
+            drawBorder: false
           },
           ticks: {
             color: '#f5f5f7',
             stepSize: isMobile ? 20 : undefined,
             callback: function(value) {
-              return isMobile ? '£' + value : value;
+              return isMobile ? '£' + value : this.getLabelForValue(value);
             },
             font: {
-              size: isMobile ? 9 : 12
-            }
-          },
-          suggestedMax: isMobile ? 100 : undefined
+              size: isMobile ? 9 : 11
+            },
+            padding: isMobile ? 5 : 8
+          }
         },
         y: {
           beginAtZero: true,
           grid: {
             display: isMobile ? false : true,
-            color: '#2a2a31'
+            color: '#2a2a31',
+            drawBorder: false
           },
           ticks: {
             color: '#f5f5f7',
             stepSize: isMobile ? undefined : 20,
             callback: function(value) {
-              return isMobile ? value : '£' + value;
+              return isMobile ? this.getLabelForValue(value) : '£' + value;
             },
             font: {
-              size: isMobile ? 9 : 12
-            }
+              size: isMobile ? 9 : 11
+            },
+            padding: isMobile ? 5 : 8
           },
           suggestedMax: isMobile ? undefined : 100
         }
@@ -1092,7 +1095,6 @@ function initChart() {
     }
   });
 }
-
 
 
 
