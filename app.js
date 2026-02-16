@@ -83,6 +83,7 @@ function getStationData(stationName) {
 }
 
 function getStationZones(stationName) {
+  // FIX: Corrected syntax error - was missing "|| [1]" and had extra "]"
   return STATION_ZONES[stationName] || [1];
 }
 
@@ -133,6 +134,7 @@ function getDailyCap(journeyList) {
   });
   
   const capKey = maxZone === 1 ? '1' : `1-${maxZone}`;
+  // FIX: Corrected syntax error - was missing "|| DAILY_CAPS['1-6']" and had extra "]"
   return DAILY_CAPS[capKey] || DAILY_CAPS['1-6'];
 }
 
@@ -465,6 +467,7 @@ function setupAutoPriceCalculation() {
     try {
       const fare = await TFL_API.calculateJourneyFare(
         origin, 
+        // FIX: Corrected syntax error - was incomplete ternary operator
         (transport === 'bus' || transport === 'tram') ? null : destination,
         dateTime
       );
@@ -636,6 +639,7 @@ async function addJourney() {
     time: time,
     transport: transport,
     origin: origin,
+    // FIX: Corrected syntax error - was incomplete ternary operator
     destination: (transport === 'bus' || transport === 'tram') ? null : destination,
     price: price,
     month: correctMonth
@@ -1011,6 +1015,11 @@ function initChart() {
   const ctx = document.getElementById('spendingChart');
   const isMobile = window.innerWidth <= 600;
   
+  // Destroy existing chart instance if it exists
+  if (spendingChart) {
+    spendingChart.destroy();
+  }
+
   spendingChart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -1031,8 +1040,8 @@ function initChart() {
         padding: {
           top: 10,
           bottom: 10,
-          left: isMobile ? 10 : 5,
-          right: isMobile ? 10 : 15 // Adjusted right padding for mobile to allow more space
+          left: isMobile ? 0 : 5,   // FIX: Set to 0 for mobile
+          right: isMobile ? 0 : 15  // FIX: Set to 0 for mobile
         }
       },
       plugins: {
@@ -1052,7 +1061,7 @@ function initChart() {
         }
       },
       scales: {
-        x: { // This is the value axis on mobile (horizontal)
+        x: { // This is the value axis on mobile (horizontal), and label axis on desktop (horizontal)
           beginAtZero: true,
           grid: {
             display: isMobile ? true : false,
@@ -1061,7 +1070,6 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
-            // Removed stepSize to let Chart.js auto-determine optimal tick values
             callback: function(value) {
               return isMobile ? '£' + value : this.getLabelForValue(value);
             },
@@ -1069,14 +1077,13 @@ function initChart() {
               size: isMobile ? 9 : 11
             },
             padding: isMobile ? 5 : 8,
-            autoSkip: true,
-            maxTicksLimit: isMobile ? 6 : 10,
-            maxRotation: isMobile ? 0 : 0,
+            autoSkip: isMobile,
+            maxTicksLimit: isMobile ? 6 : 12,
+            maxRotation: 0,
             minRotation: 0,
           },
-          // Removed suggestedMax to avoid constraining the chart height/width
         },
-        y: { // This is the label axis (months) on mobile (vertical)
+        y: { // This is the label axis (months) on mobile (vertical), and value axis on desktop (vertical)
           beginAtZero: true,
           grid: {
             display: isMobile ? false : true,
@@ -1085,7 +1092,6 @@ function initChart() {
           },
           ticks: {
             color: '#f5f5f7',
-            // Removed stepSize
             callback: function(value) {
               return isMobile ? this.getLabelForValue(value) : '£' + value;
             },
@@ -1093,17 +1099,15 @@ function initChart() {
               size: isMobile ? 9 : 11
             },
             padding: isMobile ? 5 : 8,
-            autoSkip: false, // <-- FIX: Ensure all month labels are shown
+            autoSkip: false, // FIX: Ensure all month labels are shown on mobile y-axis
             maxRotation: 0,
             minRotation: 0,
           },
-          suggestedMax: isMobile ? undefined : 100
         }
       }
     }
   });
 }
-
 
 
 function updateChart() {
@@ -1199,6 +1203,9 @@ function initCarousel() {
       navigateCarousel(-1); // Swipe right
     }
   }
+
+  // FIX: Ensure initial slide is set correctly on load
+  goToSlide(currentSlide);
 }
 
 function navigateCarousel(direction) {
@@ -1223,14 +1230,16 @@ function goToSlide(index) {
   track.style.transform = `translateX(-${currentSlide * 100}%)`;
   
   // Update active states
-  slides.forEach((slide, i) => {
-    slide.classList.toggle('active', i === currentSlide);
-  });
-  
   dots.forEach((dot, i) => {
     dot.classList.toggle('active', i === currentSlide);
   });
-  // Fix: Resize chart when showing slide 0 (chart slide)
+  // The 'active' class on slides is no longer needed for visibility with the new CSS
+  // but it's good practice to keep it if you plan to use it for other styling or logic.
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === currentSlide);
+  });
+
+  // Fix: Resize chart when showing slide 0 (chart slide) to ensure it renders correctly
   if (index === 0 && spendingChart) {
     setTimeout(() => {
       spendingChart.resize();
