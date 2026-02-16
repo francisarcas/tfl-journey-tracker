@@ -1014,7 +1014,7 @@ function initChart() {
   spendingChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: MONTHS,
+      labels: MONTHS, // This uses the month names array
       datasets: [{
         label: 'Monthly Spend',
         data: new Array(12).fill(0),
@@ -1024,9 +1024,17 @@ function initChart() {
       }]
     },
     options: {
-      indexAxis: isMobile ? 'y' : 'x', // Horizontal on mobile
+      indexAxis: isMobile ? 'y' : 'x', // Horizontal bars on mobile
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 5,
+          bottom: 5,
+          left: isMobile ? 10 : 5,
+          right: isMobile ? 10 : 5
+        }
+      },
       plugins: {
         legend: {
           display: false
@@ -1034,7 +1042,8 @@ function initChart() {
         tooltip: {
           callbacks: {
             label: function(context) {
-              return '£' + context.parsed.y.toFixed(2);
+              const value = isMobile ? context.parsed.x : context.parsed.y;
+              return '£' + value.toFixed(2);
             }
           },
           backgroundColor: 'var(--tooltip-bg)',
@@ -1044,29 +1053,47 @@ function initChart() {
       },
       scales: {
         x: {
-          grid: {
-            display: false
-          },
-          ticks: {
-            color: '#f5f5f7'
-          }
-        },
-        y: {
           beginAtZero: true,
           grid: {
+            display: isMobile ? true : false,
             color: '#2a2a31'
           },
           ticks: {
             color: '#f5f5f7',
+            stepSize: isMobile ? 20 : undefined,
+            callback: function(value) {
+              return isMobile ? '£' + value : value;
+            },
+            font: {
+              size: isMobile ? 9 : 12
+            }
+          },
+          suggestedMax: isMobile ? 100 : undefined
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            display: isMobile ? false : true,
+            color: '#2a2a31'
+          },
+          ticks: {
+            color: '#f5f5f7',
+            stepSize: isMobile ? undefined : 20,
             callback: function(value) {
               return isMobile ? value : '£' + value;
+            },
+            font: {
+              size: isMobile ? 9 : 12
             }
-          }
+          },
+          suggestedMax: isMobile ? undefined : 100
         }
       }
     }
   });
 }
+
+
 
 
 function updateChart() {
