@@ -1387,7 +1387,7 @@ button.disabled {
   /* Reduce text size for the side-by-side cards */
   #comparisonCard .label,
   #dailyCapCard .label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
   
   #comparisonCard .value,
@@ -1397,7 +1397,7 @@ button.disabled {
   
   #comparisonCard .subtext,
   #dailyCapCard .subtext {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
   
   .top-bar-container {
