@@ -1331,6 +1331,15 @@ button.disabled {
   background: var(--interactive-bg-hover);
 }
 
+.journey-time-icon-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+
+
 /* =====================================================
    MOBILE RESPONSIVE
    ===================================================== */
@@ -1441,32 +1450,43 @@ button.disabled {
   
   .journey-left {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     width: 100%;
   }
   
-  .journey-time {
+  /* Mobile: Time and icon stacked vertically and centered */
+  .journey-time-icon-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    min-width: 50px;
+    justify-content: center;
+    gap: 8px;
+    min-width: 60px;
     flex-shrink: 0;
   }
   
+  .journey-time {
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  
   .journey-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 1rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
     flex-shrink: 0;
     margin: 0;
-    padding: 3px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .journey-icon img {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
   }
   
   .journey-details {
@@ -1489,7 +1509,7 @@ button.disabled {
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding-left: 62px;
+    padding-left: 72px;
   }
   
   .journey-price {
@@ -1528,20 +1548,20 @@ button.disabled {
     width: 100%;
   }
   
-  /* Mobile Carousel Fixes (REVISED AGAIN) */
+  /* Mobile Carousel Fixes */
   .stats-carousel {
-    padding: 0 10px; /* FIX: Re-added padding to prevent nav buttons from overlapping content */
+    padding: 0 10px;
   }
 
   .carousel-slide {
-    min-height: 340px; /* Override desktop min-height for mobile */
+    min-height: 340px;
   }
 
   .carousel-nav {
     width: 32px;
     height: 32px;
     font-size: 0.9rem;
-    border-radius: 50%; /* Ensure perfectly rounded on mobile */
+    border-radius: 50%;
   }
   
   .carousel-nav-left {
@@ -1558,7 +1578,7 @@ button.disabled {
   }
   
   .stats-widget {
-    padding: 0 10px; /* FIX: Added padding to stats widgets on mobile to reduce content width */
+    padding: 0 10px;
     width: 100%;
   }
   
@@ -1606,9 +1626,9 @@ button.disabled {
   /* Chart - Full height on mobile */
   .chart-wrapper {
     width: 100%;
-    min-height: 340px; /* FIX: Removed !important, relying on flex grow */
-    max-height: none;   /* FIX: Removed max-height to allow growth */
-    height: 100%;       /* FIX: Allow to take full height of parent */
+    min-height: 340px;
+    max-height: none;
+    height: 100%;
     padding: 0; 
     display: flex;
     align-items: stretch;
@@ -1648,17 +1668,19 @@ button.disabled {
   }
   
   .insight-icon {
-    width: 60px; /* Adjusted container size for mobile icon */
+    width: 60px;
     height: 60px;
     padding: 0;
   }
   
   .insight-icon img {
-    width: 48px; /* Adjusted icon size for mobile */
+    width: 48px;
     height: 48px;
   }
 
   .insight-icon i {
-    font-size: 48px; /* Adjusted icon size for mobile */
+    font-size: 48px;
   }
 }
+
+
