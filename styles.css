@@ -1362,6 +1362,42 @@ button.disabled {
   
   .summary-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  /* Monthly spend card takes full width */
+  .summary-card.monthly-spend {
+    grid-column: 1 / -1;
+  }
+  
+  /* Comparison and Daily Cap cards side by side */
+  #comparisonCard,
+  #dailyCapCard {
+    grid-column: span 1;
+    margin-top: 8px;
+  }
+  
+  /* Create a 2-column grid for the second row */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  /* Reduce text size for the side-by-side cards */
+  #comparisonCard .label,
+  #dailyCapCard .label {
+    font-size: 0.75rem;
+  }
+  
+  #comparisonCard .value,
+  #dailyCapCard .value {
+    font-size: 1.4rem;
+  }
+  
+  #comparisonCard .subtext,
+  #dailyCapCard .subtext {
+    font-size: 0.7rem;
   }
   
   .top-bar-container {
@@ -1682,5 +1718,3 @@ button.disabled {
     font-size: 48px;
   }
 }
-
-
