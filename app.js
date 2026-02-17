@@ -903,9 +903,11 @@ function renderJourneys() {
       
       item.innerHTML = `
         <div class="journey-left">
-          <div class="journey-time">${journey.time.substring(0, 5)}</div>
-          <div class="journey-icon ${journey.transport}">
-            ${getTransportIcon(journey.transport)}
+          <div class="journey-time-icon-wrapper">
+            <div class="journey-time">${journey.time.substring(0, 5)}</div>
+            <div class="journey-icon ${journey.transport}">
+              ${getTransportIcon(journey.transport)}
+            </div>
           </div>
           <div class="journey-details">
             <div class="journey-route">${route}</div>
@@ -924,6 +926,7 @@ function renderJourneys() {
           </div>
         </div>
       `;
+
       
       dateGroup.appendChild(item);
     });
