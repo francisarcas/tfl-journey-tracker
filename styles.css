@@ -999,9 +999,9 @@ button.disabled {
 }
 
 .line-badge {
-  width: 5px;
+  width: 10px;
   height: 10px;
-  border-radius: 8%;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
