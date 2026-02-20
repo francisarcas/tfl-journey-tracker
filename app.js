@@ -883,23 +883,42 @@ function renderJourneys() {
       ).join('') : '';
       
       const route = journey.destination 
-        ? `
-          <span class="station-with-lines">
-            ${journey.origin}
-            <span class="line-indicators">${originBadges}</span>
-          </span>
-          <span class="arrow">→</span>
-          <span class="station-with-lines">
-            ${journey.destination}
-            <span class="line-indicators">${destinationBadges}</span>
-          </span>
-        `
-        : `
-          <span class="station-with-lines">
-            ${journey.origin}
-            <span class="line-indicators">${originBadges}</span>
-          </span>
-        `;
+  ? `
+    <div class="mobile-station-row">
+      <div class="tfl-connector mobile-connector-dot"><div class="circle-dots"></div></div>
+      <span class="station-with-lines">
+        ${journey.origin}
+        <span class="line-indicators">${originBadges}</span>
+      </span>
+    </div>
+    <div class="tfl-connector desktop-connector">
+      <div class="tfl-dots">
+        <div class="circle-dots"></div>
+        <div class="bar-line"></div>
+        <div class="circle-dots"></div>
+      </div>
+    </div>
+    <div class="mobile-bar-only">
+      <div class="bar-line-vertical"></div>
+    </div>
+    <div class="mobile-station-row">
+      <div class="tfl-connector mobile-connector-dot"><div class="circle-dots"></div></div>
+      <span class="station-with-lines">
+        ${journey.destination}
+        <span class="line-indicators">${destinationBadges}</span>
+      </span>
+    </div>
+  `
+  : `
+    <div class="mobile-station-row">
+      <span class="station-with-lines">
+        ${journey.origin}
+        <span class="line-indicators">${originBadges}</span>
+      </span>
+    </div>
+  `;
+
+
       
       item.innerHTML = `
         <div class="journey-left">

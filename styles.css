@@ -393,7 +393,6 @@ h1 {
   margin-top: 4px;
 }
 
-/* TFL Blue styling for "This Month" card */
 .summary-card.monthly-spend {
   position: relative;
   background: #0000a0;
@@ -448,61 +447,53 @@ h1 {
 }
 
 /* =====================================================
-   CAROUSEL STYLES (REVISED)
+   CAROUSEL STYLES
    ===================================================== */
 
 .stats-carousel {
   position: relative;
-  overflow: hidden; /* This is key for hiding non-active slides */
-  padding: 0 40px; /* Keep a small padding on desktop for aesthetics */
+  overflow: hidden;
+  padding: 0 40px;
   width: 100%;
-  box-sizing: border-box; /* Ensure padding doesn't add to width */
+  box-sizing: border-box;
 }
 
 .carousel-container {
-  overflow: hidden; /* This is key for hiding non-active slides */
+  overflow: hidden;
   width: 100%;
   position: relative;
-  /* Flexbox properties to ensure content fills available space */
   display: flex;
   flex-direction: row;
-  align-items: stretch; /* Stretch children vertically */
-  flex-shrink: 0; /* Prevent container from shrinking unexpectedly */
-  min-width: 0;   /* Prevent container from shrinking unexpectedly */
+  align-items: stretch;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .carousel-track {
   display: flex;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  /* The track needs to be as wide as all slides combined */
-  width: 100%; /* Base width, JS will handle actual transform */
+  width: 100%;
   position: relative;
   left: 0;
-  /* Ensure content within track doesn't wrap */
   white-space: nowrap;
 }
 
 .carousel-slide {
-  /* Each slide should take up 100% of the carousel-container's width */
-  flex: 0 0 100%; /* Crucial: Don't grow, don't shrink, base width 100% */
-  width: 100%; /* Fallback for older browsers, but flex-basis is primary */
+  flex: 0 0 100%;
+  width: 100%;
   box-sizing: border-box;
-  min-height: 280px; /* Maintain minimum height */
+  min-height: 280px;
   display: flex;
-  flex-direction: column; /* Allow content inside slide to stack */
-  justify-content: stretch; /* Stretch content inside slide vertically */
-  align-items: stretch; /* Stretch content inside slide horizontally */
-  padding: 0; /* No internal padding on the slide itself */
-  
-  /* REMOVE any opacity or display: none; rules here. All slides should be rendered. */
-  /* Their visibility is controlled by carousel-container's overflow and carousel-track's transform. */
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  padding: 0;
 }
 
 .carousel-slide > * {
   width: 100%;
 }
 
-/* Navigation Buttons */
 .carousel-nav {
   position: absolute;
   top: 50%;
@@ -513,7 +504,7 @@ h1 {
   width: 40px;
   height: 40px;
   font-size: 1rem;
-  border-radius: 50%; /* Ensure perfectly round */
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -542,7 +533,6 @@ h1 {
   right: 8px;
 }
 
-/* Indicators (dots) */
 .carousel-indicators {
   display: flex;
   justify-content: center;
@@ -710,7 +700,6 @@ h1 {
   height: 100% !important;
 }
 
-/* Insight Grid */
 .insight-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -753,7 +742,7 @@ h1 {
 }
 
 .insight-icon {
-  width: 80px; /* Container size for desktop */
+  width: 80px;
   height: 80px;
   display: flex;
   align-items: center;
@@ -764,16 +753,15 @@ h1 {
   flex-shrink: 0;
 }
 
-/* FIX: Make favorite transport icon bigger for desktop */
 .insight-icon img {
-  width: 60px; /* Increased size */
-  height: 60px; /* Increased size */
+  width: 60px;
+  height: 60px;
   object-fit: contain;
   display: block;
 }
 
 .insight-icon i {
-  font-size: 60px; /* Increased size for Font Awesome icons */
+  font-size: 60px;
   color: var(--accent1);
 }
 
@@ -1045,6 +1033,69 @@ button.disabled {
 .line-badge.tram { background: var(--tram); }
 
 /* =====================================================
+   TFL CONNECTOR (replaces arrow)
+   ===================================================== */
+
+.tfl-connector {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Desktop: full horizontal connector with both circles and bar */
+.desktop-connector {
+  display: flex;
+}
+
+/* Mobile: only the single dot per station row */
+.mobile-connector-dot {
+  display: none;
+  width: 20px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Mobile: only the vertical bar between the two station rows */
+.mobile-bar-only {
+  display: none;
+  padding-left: 5px;
+  align-items: center;
+}
+
+/* Desktop horizontal layout */
+.tfl-dots {
+  display: flex;
+  align-items: center;
+}
+
+.circle-dots {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid #585858;
+  background: white;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.bar-line {
+  width: 30px;
+  height: 4px;
+  background: #383839;
+  margin: 0 -3px;
+  flex-shrink: 0;
+}
+
+.bar-line-vertical {
+  width: 4px;
+  height: 16px;
+  background: #9a9aa0;
+  flex-shrink: 0;
+  margin: -3px 0;
+}
+
+/* =====================================================
    JOURNEY LIST
    ===================================================== */
 
@@ -1125,6 +1176,7 @@ button.disabled {
   min-width: 0;
 }
 
+/* Desktop: horizontal flex row */
 .journey-route {
   font-size: 0.95rem;
   font-weight: 500;
@@ -1133,11 +1185,6 @@ button.disabled {
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-}
-
-.journey-route .arrow {
-  color: var(--muted);
-  font-size: 0.8rem;
 }
 
 .journey-transport {
@@ -1165,6 +1212,7 @@ button.disabled {
   gap: 10px;
 }
 
+/* Desktop: station name + line badges inline */
 .station-with-lines {
   display: inline-flex;
   align-items: center;
@@ -1174,6 +1222,11 @@ button.disabled {
 .station-with-lines .line-indicators {
   display: inline-flex;
   gap: 3px;
+}
+
+.mobile-station-row {
+  display: inline-flex;
+  align-items: center;
 }
 
 .action {
@@ -1338,8 +1391,6 @@ button.disabled {
   gap: 12px;
 }
 
-
-
 /* =====================================================
    MOBILE RESPONSIVE
    ===================================================== */
@@ -1355,36 +1406,22 @@ button.disabled {
     width: 100%;
   }
 
-  .journey-icon img {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .summary-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  /* Monthly spend card takes full width */
-  .summary-card.monthly-spend {
-    grid-column: 1 / -1;
-  }
-  
-  /* Comparison and Daily Cap cards side by side */
-  #comparisonCard,
-  #dailyCapCard {
-    grid-column: span 1;
-    margin-top: 8px;
-  }
-  
-  /* Create a 2-column grid for the second row */
   .summary-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
+
+  .summary-card.monthly-spend {
+    grid-column: 1 / -1;
+  }
   
-  /* Reduce text size for the side-by-side cards */
+  #comparisonCard,
+  #dailyCapCard {
+    grid-column: span 1;
+    margin-top: 8px;
+  }
+
   #comparisonCard .label,
   #dailyCapCard .label {
     font-size: 0.6rem;
@@ -1476,7 +1513,8 @@ button.disabled {
     height: 360px;
     left: -50px;
   }
-  
+
+  /* Mobile journey item */
   .journey-item {
     display: flex;
     flex-direction: column;
@@ -1486,19 +1524,18 @@ button.disabled {
   
   .journey-left {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     width: 100%;
   }
-  
-  /* Mobile: Time and icon stacked vertically and centered */
+
   .journey-time-icon-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
-    min-width: 60px;
+    min-width: 40px;
     flex-shrink: 0;
   }
   
@@ -1529,10 +1566,49 @@ button.disabled {
     flex: 1;
     min-width: 0;
   }
-  
+
+  /* Mobile route: column so station rows stack vertically */
   .journey-route {
     font-size: 0.9rem;
     word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  /* Show mobile elements, hide desktop connector */
+  .desktop-connector {
+    display: none;
+  }
+
+  .mobile-connector-dot {
+    display: flex;
+  }
+
+ .mobile-bar-only {
+    display: flex;
+    padding-left: 8px;
+    margin: -3px 0;
+    height: auto;
+  }
+
+  /* Each station row: circle on the left, name on the right */
+  .mobile-station-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Station name + badges inline */
+  .station-with-lines {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    white-space: normal;
   }
   
   .journey-transport {
@@ -1545,7 +1621,7 @@ button.disabled {
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding-left: 72px;
+    padding-left: 52px;
   }
   
   .journey-price {
@@ -1584,7 +1660,7 @@ button.disabled {
     width: 100%;
   }
   
-  /* Mobile Carousel Fixes */
+  /* Mobile Carousel */
   .stats-carousel {
     padding: 0 10px;
   }
@@ -1618,7 +1694,6 @@ button.disabled {
     width: 100%;
   }
   
-  /* Stats List - Vertical alignment on mobile */
   .stats-list {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1659,13 +1734,12 @@ button.disabled {
     text-align: center;
   }
 
-  /* Chart - Full height on mobile */
   .chart-wrapper {
     width: 100%;
     min-height: 340px;
     max-height: none;
     height: 100%;
-    padding: 0; 
+    padding: 0;
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -1677,7 +1751,6 @@ button.disabled {
     height: 100% !important;
   }
   
-  /* Insight Grid - Vertical on mobile */
   .insight-grid {
     grid-template-columns: 1fr;
     gap: 10px;
