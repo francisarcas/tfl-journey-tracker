@@ -574,6 +574,23 @@ function setupStationAutocomplete(inputId, suggestionsId) {
   });
 }
 
+function toggleCarousel() {
+  const collapsible = document.getElementById('carouselCollapsible');
+  const icon = document.getElementById('carouselToggleIcon');
+  
+  const isExpanded = collapsible.classList.contains('expanded');
+  
+  collapsible.classList.toggle('expanded', !isExpanded);
+  icon.classList.toggle('fa-chevron-down', isExpanded);
+  icon.classList.toggle('fa-chevron-up', !isExpanded);
+
+  // Resize chart when expanding
+  if (!isExpanded && spendingChart) {
+    setTimeout(() => spendingChart.resize(), 420);
+  }
+}
+
+
 function handleTransportChange() {
   const transport = document.getElementById('transportInput').value;
   const destinationGroup = document.getElementById('destinationGroup');
