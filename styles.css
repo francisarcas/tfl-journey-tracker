@@ -673,7 +673,7 @@ h1 {
 }
 
 .stats-name .line-badge {
-  width: 10px;
+  width: 14px;
   height: 10px;
   border-radius: 50%;
 }
@@ -1391,6 +1391,10 @@ button.disabled {
   gap: 12px;
 }
 
+.carousel-toggle-header {
+  display: none;
+}
+
 /* =====================================================
    MOBILE RESPONSIVE
    ===================================================== */
@@ -1789,5 +1793,35 @@ button.disabled {
 
   .insight-icon i {
     font-size: 48px;
+  }
+
+  .carousel-container {
+    padding-top: 20px;
+  }
+  .carousel-toggle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 0;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1rem;
+    user-select: none;
+  }
+
+  .carousel-toggle-header i {
+    color: var(--muted);
+    transition: transform 0.3s ease;
+  }
+
+  .carousel-collapsible {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+  .carousel-collapsible.expanded {
+    max-height: 600px;
   }
 }
