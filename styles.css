@@ -874,6 +874,9 @@ input[type="datetime-local"] {
   font-size: 0.95rem;
   height: 44px;
   color-scheme: dark;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
@@ -1405,7 +1408,10 @@ button.disabled {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
+  #dateTimeInput {
+  padding: 12px 8px;
+}
   .form-group {
     width: 100%;
   }
