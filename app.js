@@ -512,19 +512,21 @@ function setupStationAutocomplete(inputId, suggestionsId) {
     }
     
     let filteredStations;
-    if (transport === 'bus') {
-      filteredStations = TFL_STATIONS.filter(station => 
-        station.lines.includes('bus') && station.name.toLowerCase().includes(query)
-      );
-    } else if (transport === 'tram') {
-      filteredStations = TFL_STATIONS.filter(station => 
-        station.lines.includes('tram') && station.name.toLowerCase().includes(query)
-      );
-    } else {
-      filteredStations = TFL_STATIONS.filter(station => 
-        !station.lines.includes('bus') && !station.lines.includes('tram') && station.name.toLowerCase().includes(query)
-      );
-    }
+      if (transport === 'bus') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('bus') && station.name.toLowerCase().includes(query)
+        );
+      } else if (transport === 'tram') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('tram') && station.name.toLowerCase().includes(query)
+        );
+      } else {
+        filteredStations = TFL_STATIONS.filter(station => 
+          !station.lines.every(line => line === 'bus' || line === 'tram') && 
+          station.name.toLowerCase().includes(query)
+        );
+      }
+
     
     const matches = filteredStations.slice(0, 10);
     
