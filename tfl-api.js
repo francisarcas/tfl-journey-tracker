@@ -132,29 +132,29 @@ const TFL_API = {
     
     const isPeak = this.isPeakTime(dateTime);
     
-    // 2026 TFL Fare matrix - CORRECTED with real TFL contactless fares
+
     const fareMatrix = {
-      '1-1': { peak: 2.80, offPeak: 2.80 },
-      '1-2': { peak: 3.70, offPeak: 2.80 },
-      '1-3': { peak: 4.10, offPeak: 2.90 },
-      '1-4': { peak: 4.60, offPeak: 3.40 },
-      '1-5': { peak: 5.10, offPeak: 3.40 },
-      '1-6': { peak: 5.60, offPeak: 3.40 },
-      '2-2': { peak: 2.50, offPeak: 1.90 },
-      '2-3': { peak: 2.50, offPeak: 1.90 },
-      '2-4': { peak: 2.50, offPeak: 1.90 },
-      '2-5': { peak: 3.00, offPeak: 1.90 },
-      '2-6': { peak: 3.00, offPeak: 1.90 },
-      '3-3': { peak: 2.50, offPeak: 1.90 },
-      '3-4': { peak: 2.50, offPeak: 1.90 },
-      '3-5': { peak: 3.00, offPeak: 1.90 },
-      '3-6': { peak: 3.00, offPeak: 1.90 },
-      '4-4': { peak: 2.50, offPeak: 2.20 },
-      '4-5': { peak: 3.00, offPeak: 2.20 },
-      '4-6': { peak: 3.00, offPeak: 2.20 },
-      '5-5': { peak: 3.00, offPeak: 2.20 },
-      '5-6': { peak: 3.00, offPeak: 2.20 },
-      '6-6': { peak: 3.00, offPeak: 2.20 }
+      '1-1':   { peak: 3.10, offPeak: 3.00 },
+      '1-2':   { peak: 3.60, offPeak: 3.10 },
+      '1-3':   { peak: 3.90, offPeak: 3.30 },
+      '1-4':   { peak: 4.80, offPeak: 3.60 },
+      '1-5':   { peak: 5.30, offPeak: 3.80 },
+      '1-6':   { peak: 5.90, offPeak: 4.00 },
+      '2-2':   { peak: 2.30, offPeak: 2.20 },
+      '2-3':   { peak: 2.30, offPeak: 2.20 },
+      '2-4':   { peak: 2.80, offPeak: 2.20 },
+      '2-5':   { peak: 3.30, offPeak: 2.40 },
+      '2-6':   { peak: 3.60, offPeak: 2.60 },
+      '3-3':   { peak: 2.30, offPeak: 2.20 },
+      '3-4':   { peak: 2.30, offPeak: 2.20 },
+      '3-5':   { peak: 3.30, offPeak: 2.40 },
+      '3-6':   { peak: 3.60, offPeak: 2.60 },
+      '4-4':   { peak: 2.30, offPeak: 2.20 },
+      '4-5':   { peak: 3.30, offPeak: 2.40 },
+      '4-6':   { peak: 3.60, offPeak: 2.60 },
+      '5-5':   { peak: 3.30, offPeak: 2.40 },
+      '5-6':   { peak: 3.60, offPeak: 2.60 },
+      '6-6':   { peak: 3.60, offPeak: 2.60 }
     };
     
     // Determine the fare zone key
