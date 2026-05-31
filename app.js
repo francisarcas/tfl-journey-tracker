@@ -73,7 +73,9 @@ function capitalizeLineName(line) {
     'overground': 'Overground',
     'dlr': 'DLR',
     'tram': 'Tram',
-    'bus': 'Bus'
+    'bus': 'Bus',
+    'cable-car': 'Cable Car',
+    'uber-boat': 'Uber Boat'
   };
   return names[line] || line;
 }
@@ -94,7 +96,9 @@ function getTransportIcon(transport) {
     elizabeth: '<img src="assets/logos/elizabeth.png" alt="Elizabeth Line">',
     tram: '<img src="assets/logos/trams.png" alt="Tram">',
     bus: '<img src="assets/logos/buses.png" alt="Bus">',
-    dlr: '<img src="assets/logos/dlr.png" alt="DLR">'
+    dlr: '<img src="assets/logos/dlr.png" alt="DLR">',
+    'cable-car': '<img src="assets/logos/cablecar.png" alt="Cable Car">',
+    'uber-boat': '<img src="assets/logos/uber-boats.png" alt="Uber Boat">'
   };
   return icons[transport] || '<img src="assets/logos/underground.png" alt="Transport" style="width: 20px; height: 20px; object-fit: contain;">';
 }
@@ -116,7 +120,7 @@ function formatDate(dateString) {
 }
 
 function getDailyCap(journeyList) {
-  const allBus = journeyList.every(j => j.transport === 'bus' || j.transport === 'tram');
+  const allBus = journeyList.every(j => j.transport === 'bus' || j.transport === 'tram' || j.transport === 'cable-car' || j.transport === 'uber-boat');
   
   if (allBus) {
     return DAILY_CAPS['bus'];
@@ -124,7 +128,7 @@ function getDailyCap(journeyList) {
   
   let maxZone = 1;
   journeyList.forEach(journey => {
-    if (journey.transport !== 'bus' && journey.transport !== 'tram') {
+    if (journey.transport !== 'bus' && journey.transport !== 'tram' && journey.transport !== 'cable-car' && journey.transport !== 'uber-boat') {
       const originZones = getStationZones(journey.origin);
       const destZones = journey.destination ? getStationZones(journey.destination) : originZones;
       
@@ -449,7 +453,7 @@ function setupAutoPriceCalculation() {
     const dateTime = dateTimeInput.value;
     
     if (!dateTime || !origin) return;
-    if (transport !== 'bus' && transport !== 'tram' && !destination) return;
+    if (transport !== 'bus' && !destination) return;
     
     if (lastCalculation.origin === origin && 
         lastCalculation.destination === destination && 
@@ -466,10 +470,10 @@ function setupAutoPriceCalculation() {
     
     try {
       const fare = await TFL_API.calculateJourneyFare(
-        origin, 
-        // FIX: Corrected syntax error - was incomplete ternary operator
-        (transport === 'bus' || transport === 'tram') ? null : destination,
-        dateTime
+        origin,
+        (transport === 'bus') ? null : destination,
+        dateTime,
+        transport
       );
       
       priceInput.value = fare.toFixed(2);
@@ -516,13 +520,21 @@ function setupStationAutocomplete(inputId, suggestionsId) {
         filteredStations = TFL_STATIONS.filter(station => 
           station.lines.includes('bus') && station.name.toLowerCase().includes(query)
         );
+      } else if (transport === 'cable-car') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('cable-car') && station.name.toLowerCase().includes(query)
+        );
+      } else if (transport === 'uber-boat') {
+        filteredStations = TFL_STATIONS.filter(station => 
+          station.lines.includes('uber-boat') && station.name.toLowerCase().includes(query)
+        );
       } else if (transport === 'tram') {
         filteredStations = TFL_STATIONS.filter(station => 
           station.lines.includes('tram') && station.name.toLowerCase().includes(query)
         );
       } else {
         filteredStations = TFL_STATIONS.filter(station => 
-          !station.lines.every(line => line === 'bus' || line === 'tram') && 
+          !station.lines.every(line => line === 'bus' || line === 'tram' || line === 'cable-car' || line === 'uber-boat') && 
           station.name.toLowerCase().includes(query)
         );
       }
@@ -602,6 +614,16 @@ function handleTransportChange() {
     document.getElementById('destinationInput').value = '';
     originLabel.textContent = 'Bus Route';
     originInput.placeholder = 'Select bus number';
+  } else if (transport === 'cable-car') {
+    destinationGroup.style.display = 'block';
+    originLabel.textContent = 'From';
+    originInput.placeholder = 'Greenwich Peninsula or Royal Docks';
+    document.getElementById('destinationInput').placeholder = 'Greenwich Peninsula or Royal Docks';
+  } else if (transport === 'uber-boat') {
+    destinationGroup.style.display = 'block';
+    originLabel.textContent = 'From Pier';
+    originInput.placeholder = 'Departure pier or route (RB1…)';
+    document.getElementById('destinationInput').placeholder = 'Arrival pier';
   } else if (transport === 'tram') {
     destinationGroup.style.display = 'block';
     originLabel.textContent = 'From';
@@ -643,7 +665,7 @@ async function addJourney() {
     return;
   }
   
-  if (transport !== 'bus' && transport !== 'tram' && !destination) {
+  if (transport !== 'bus' && !destination) {
     alert('Please enter a destination station');
     return;
   }
@@ -659,7 +681,7 @@ async function addJourney() {
     transport: transport,
     origin: origin,
     // FIX: Corrected syntax error - was incomplete ternary operator
-    destination: (transport === 'bus' || transport === 'tram') ? null : destination,
+    destination: (transport === 'bus') ? null : destination,
     price: price,
     month: correctMonth
   };

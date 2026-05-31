@@ -64,17 +64,49 @@ const TFL_API = {
     }
   },
   
+  // Uber Boat flat fares (2026) — keyed by route number or pier-to-pier
+  uberBoatFares: {
+    'RB1': 7.00,   // Putney ↔ Tower
+    'RB2': 7.00,   // Putney ↔ Woolwich
+    'RB4': 6.50,   // Rotherhithe ↔ Canary Wharf (short hop)
+    'RB6': 7.00,   // Battersea ↔ Barking Riverside
+  },
+
+  // Cable Car flat fare (2026) — IFS Cloud Cable Car
+  cableCarFare: 5.00,
+
+  // Returns the Uber Boat route fare. If the origin is a route number (RB1 etc.)
+  // use that directly; otherwise default to the standard river single.
+  getUberBoatFare(fromStation) {
+    const route = fromStation.toUpperCase().trim();
+    if (this.uberBoatFares[route] !== undefined) {
+      return this.uberBoatFares[route];
+    }
+    // Pier-to-pier default — standard single
+    return 7.00;
+  },
+
   // Calculate journey fare using zone-based calculation
-  async calculateJourneyFare(fromStation, toStation, dateTime) {
+  async calculateJourneyFare(fromStation, toStation, dateTime, transport) {
     try {
-      // For bus journeys, return fixed fare
+      // Bus — flat single fare
       if (!toStation) {
         return 1.75;
       }
-      
-      // Always use zone-based calculation
+
+      // Cable Car — flat single fare (Oyster/contactless discounted rate)
+      if (transport === 'cable-car') {
+        return this.cableCarFare;
+      }
+
+      // Uber Boat — flat fare by route or default pier-to-pier rate
+      if (transport === 'uber-boat') {
+        return this.getUberBoatFare(fromStation);
+      }
+
+      // All other modes — zone-based calculation
       return this.fallbackFareCalculation(fromStation, toStation, dateTime);
-      
+
     } catch (error) {
       console.error('Error calculating fare:', error);
       return this.fallbackFareCalculation(fromStation, toStation, dateTime);

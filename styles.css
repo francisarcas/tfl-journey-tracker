@@ -33,6 +33,8 @@
   --tram: #84B817;
   --dlr: #00A4A7;
   --bus: #DC241F;
+  --cable-car: #E73F8C;
+  --uber-boat: #007AFF;
 }
 
 * {
@@ -1034,6 +1036,8 @@ button.disabled {
 .line-badge.dlr { background: var(--dlr); }
 .line-badge.bus { background: var(--bus); }
 .line-badge.tram { background: var(--tram); }
+.line-badge.cable-car { background: var(--cable-car); }
+.line-badge.uber-boat { background: var(--uber-boat); }
 
 /* =====================================================
    TFL CONNECTOR (replaces arrow)
