@@ -1323,152 +1323,150 @@ function goToSlide(index) {
 
 function calculateTopStations() {
   const monthJourneys = journeys.filter(j => j.month === activeMonth);
-  
-  if (monthJourneys.length === 0) {
-    return [];
-  }
-  
-  const stationCounts = {};
-  
+
+  const stationData = {};
   monthJourneys.forEach(journey => {
-    // Count origin
-    if (journey.origin) {
-      stationCounts[journey.origin] = (stationCounts[journey.origin] || 0) + 1;
+    // Skip bus route numbers and mode-only entries
+    const skipLines = ['bus', 'cable-car', 'uber-boat'];
+    const isSkip = name => {
+      const s = TFL_STATIONS.find(st => st.name === name);
+      return s && s.lines.every(l => skipLines.includes(l));
+    };
+
+    if (journey.origin && !isSkip(journey.origin)) {
+      if (!stationData[journey.origin]) stationData[journey.origin] = { count: 0, spend: 0 };
+      stationData[journey.origin].count++;
+      stationData[journey.origin].spend += journey.price;
     }
-    // Count destination (if not bus)
-    if (journey.destination && journey.transport !== 'bus') {
-      stationCounts[journey.destination] = (stationCounts[journey.destination] || 0) + 1;
+    if (journey.destination && !isSkip(journey.destination)) {
+      if (!stationData[journey.destination]) stationData[journey.destination] = { count: 0, spend: 0 };
+      stationData[journey.destination].count++;
+      stationData[journey.destination].spend += journey.price;
     }
   });
-  
-  // Convert to array and sort
-  const sortedStations = Object.entries(stationCounts)
-    .map(([name, count]) => ({ name, count }))
+
+  return Object.entries(stationData)
+    .map(([name, d]) => ({ name, count: d.count, spend: d.spend }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 3);
-  
-  return sortedStations;
+    .slice(0, 5);
 }
 
-function calculateBusiestWeek() {
+function calculateSpendByTransport() {
   const monthJourneys = journeys.filter(j => j.month === activeMonth);
-  
-  if (monthJourneys.length === 0) {
-    return { weekStart: null, count: 0 };
-  }
-  
-  const weekCounts = {};
-  
-  monthJourneys.forEach(journey => {
-    const date = new Date(journey.date + 'T00:00:00');
-    // Get Monday of the week
-    const dayOfWeek = date.getDay();
-    const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const monday = new Date(date.setDate(diff));
-    const weekKey = monday.toISOString().split('T')[0];
-    
-    weekCounts[weekKey] = (weekCounts[weekKey] || 0) + 1;
+  const totals = {};
+  monthJourneys.forEach(j => {
+    totals[j.transport] = (totals[j.transport] || 0) + j.price;
   });
-  
-  let busiestWeek = { weekStart: null, count: 0 };
-  
-  Object.entries(weekCounts).forEach(([weekStart, count]) => {
-    if (count > busiestWeek.count) {
-      busiestWeek = { weekStart, count };
-    }
-  });
-  
-  return busiestWeek;
+  return Object.entries(totals)
+    .map(([transport, spend]) => ({ transport, spend }))
+    .sort((a, b) => b.spend - a.spend);
 }
 
-function calculateFavoriteTransport() {
+function calculateDailyAverages() {
   const monthJourneys = journeys.filter(j => j.month === activeMonth);
-  
   if (monthJourneys.length === 0) {
-    return { transport: 'underground', count: 0 };
+    return { avgSpend: 0, avgJourneys: 0, peakPct: 0, offpeakPct: 0 };
   }
-  
-  const transportCounts = {};
-  
-  monthJourneys.forEach(journey => {
-    transportCounts[journey.transport] = (transportCounts[journey.transport] || 0) + 1;
+
+  const days = {};
+  let peakCount = 0;
+  let offpeakCount = 0;
+
+  monthJourneys.forEach(j => {
+    if (!days[j.date]) days[j.date] = { spend: 0, count: 0 };
+    days[j.date].spend += j.price;
+    days[j.date].count++;
+
+    const dt = `${j.date}T${j.time}`;
+    if (TFL_API.isPeakTime(dt)) { peakCount++; } else { offpeakCount++; }
   });
-  
-  let favorite = { transport: 'underground', count: 0 };
-  
-  Object.entries(transportCounts).forEach(([transport, count]) => {
-    if (count > favorite.count) {
-      favorite = { transport, count };
-    }
-  });
-  
-  return favorite;
+
+  const dayList = Object.values(days);
+  const totalDays = dayList.length;
+  const avgSpend    = dayList.reduce((s, d) => s + d.spend, 0) / totalDays;
+  const avgJourneys = dayList.reduce((s, d) => s + d.count, 0) / totalDays;
+  const total = peakCount + offpeakCount;
+
+  return {
+    avgSpend,
+    avgJourneys,
+    peakPct:    total > 0 ? Math.round((peakCount    / total) * 100) : 0,
+    offpeakPct: total > 0 ? Math.round((offpeakCount / total) * 100) : 0
+  };
 }
 
 function updateStatsWidgets() {
-  // Update Top Stations
+  // ── Slide 2: Top 5 Stations ──────────────────────────────────
   const topStations = calculateTopStations();
   const topStationsList = document.getElementById('topStationsList');
-  
+  const medals = ['🥇', '🥈', '🥉', '4', '5'];
+
   if (topStations.length === 0) {
     topStationsList.innerHTML = `
       <div class="stats-item">
         <div class="stats-rank">-</div>
         <div class="stats-info">
           <div class="stats-name">No data yet</div>
-          <div class="stats-value">Start tracking to see stats</div>
+          <div class="stats-meta"><div class="stats-value">Start tracking to see stats</div></div>
         </div>
       </div>
     `;
   } else {
-    topStationsList.innerHTML = topStations.map((station, index) => {
-      const stationData = getStationData(station.name);
-      const lineBadges = stationData ? stationData.lines.map(line => 
+    topStationsList.innerHTML = topStations.map((station, i) => {
+      const sData = getStationData(station.name);
+      const lineBadges = sData ? sData.lines.map(line =>
         `<div class="line-badge ${line}" title="${capitalizeLineName(line)}"></div>`
       ).join('') : '';
-      
+
       return `
         <div class="stats-item">
-          <div class="stats-rank">${index + 1}</div>
+          <div class="stats-rank">${medals[i] || i + 1}</div>
           <div class="stats-info">
             <div class="stats-name">
               ${station.name}
               ${lineBadges ? `<span class="line-indicators">${lineBadges}</span>` : ''}
             </div>
-            <div class="stats-value">${station.count} visit${station.count !== 1 ? 's' : ''}</div>
+            <div class="stats-meta">
+              <div class="stats-spend">£${station.spend.toFixed(2)}</div>
+              <div class="stats-value">${station.count} visit${station.count !== 1 ? 's' : ''}</div>
+            </div>
           </div>
         </div>
       `;
     }).join('');
   }
-  
-  // Update Busiest Week
-  const busiestWeek = calculateBusiestWeek();
-  const busiestWeekEl = document.getElementById('busiestWeek');
-  const busiestWeekJourneysEl = document.getElementById('busiestWeekJourneys');
-  
-  if (busiestWeek.weekStart) {
-    const weekDate = new Date(busiestWeek.weekStart + 'T00:00:00');
-    const options = { day: 'numeric', month: 'short' };
-    const weekEnd = new Date(weekDate);
-    weekEnd.setDate(weekEnd.getDate() + 6);
-    
-    busiestWeekEl.textContent = `${weekDate.toLocaleDateString('en-GB', options)} - ${weekEnd.toLocaleDateString('en-GB', options)}`;
-    busiestWeekJourneysEl.textContent = `${busiestWeek.count} journey${busiestWeek.count !== 1 ? 's' : ''}`;
-  } else {
-    busiestWeekEl.textContent = 'No data';
-    busiestWeekJourneysEl.textContent = '0 journeys';
-  }
-  
-  // Update Favorite Transport
-  const favoriteTransport = calculateFavoriteTransport();
-  const favoriteTransportIconEl = document.getElementById('favoriteTransportIcon');
-  const favoriteTransportNameEl = document.getElementById('favoriteTransportName');
-  const favoriteTransportCountEl = document.getElementById('favoriteTransportCount');
 
-  favoriteTransportIconEl.innerHTML = getTransportIcon(favoriteTransport.transport);
-  favoriteTransportNameEl.textContent = capitalizeLineName(favoriteTransport.transport);
-  favoriteTransportCountEl.textContent = `${favoriteTransport.count} journey${favoriteTransport.count !== 1 ? 's' : ''}`;
+  // ── Slide 3: Month at a Glance ───────────────────────────────
+
+  // Spend by transport
+  const spendByTransport = calculateSpendByTransport();
+  const spendList = document.getElementById('spendByTransportList');
+  const maxSpend = spendByTransport.length > 0 ? spendByTransport[0].spend : 1;
+
+  if (spendByTransport.length === 0) {
+    spendList.innerHTML = `<div class="glance-empty">No data yet</div>`;
+  } else {
+    spendList.innerHTML = spendByTransport.map(({ transport, spend }) => {
+      const barWidth = Math.round((spend / maxSpend) * 100);
+      return `
+        <div class="glance-transport-row">
+          <div class="glance-transport-icon">${getTransportIcon(transport)}</div>
+          <div class="glance-transport-name">${capitalizeLineName(transport)}</div>
+          <div class="glance-transport-bar-wrap">
+            <div class="glance-transport-bar" style="width:${barWidth}%"></div>
+          </div>
+          <div class="glance-transport-spend">£${spend.toFixed(2)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Daily averages + peak split
+  const avgs = calculateDailyAverages();
+  document.getElementById('avgSpendPerDay').textContent    = `£${avgs.avgSpend.toFixed(2)}`;
+  document.getElementById('avgJourneysPerDay').textContent = avgs.avgJourneys.toFixed(1);
+  document.getElementById('peakJourneysPct').textContent   = `${avgs.peakPct}%`;
+  document.getElementById('offpeakJourneysPct').textContent = `${avgs.offpeakPct}%`;
 }
 
 // =====================================================

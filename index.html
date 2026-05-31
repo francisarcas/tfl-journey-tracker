@@ -131,7 +131,8 @@
                 <div class="stats-widget">
                   <h3 class="widget-title">
                     <i class="fa-solid fa-location-dot"></i>
-                    Most Visited Stations
+                    Top Stations
+                    <span class="widget-scope" id="topStationsScope">this month</span>
                   </h3>
                   <div class="stats-list" id="topStationsList">
                     <div class="stats-item">
@@ -145,41 +146,50 @@
                 </div>
               </div>
               
-              <!-- Slide 3: Weekly Stats & Transport -->
+              <!-- Slide 3: Month at a Glance -->
               <div class="carousel-slide">
                 <div class="stats-widget">
                   <h3 class="widget-title">
-                    <i class="fa-solid fa-chart-line"></i>
-                    Travel Insights
+                    <i class="fa-solid fa-gauge-high"></i>
+                    Month at a Glance
                   </h3>
-                  <div class="insight-grid">
-                    <div class="insight-card">
-                      <div style="width: 100%;">
-                        <div class="insight-label">Busiest Week</div>
-                        <div class="insight-content">
-                          <div class="insight-icon">
-                            <i class="fa-solid fa-chart-line" style="font-size: 30px; color: var(--accent1);"></i>
-                          </div>
-                          <div class="insight-text">
-                            <div class="insight-value" id="busiestWeek">-</div>
-                            <div class="insight-subtext" id="busiestWeekJourneys">0 journeys</div>
-                          </div>
+                  <div class="glance-grid">
+
+                    <!-- Left: Spend by transport -->
+                    <div class="glance-card">
+                      <div class="glance-label">
+                        <i class="fa-solid fa-wallet"></i> Spend by Mode
+                      </div>
+                      <div class="glance-transport-list" id="spendByTransportList">
+                        <div class="glance-empty">No data yet</div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Daily averages + peak split -->
+                    <div class="glance-card">
+                      <div class="glance-label">
+                        <i class="fa-solid fa-clock"></i> Daily Averages
+                      </div>
+                      <div class="glance-avg-list">
+                        <div class="glance-avg-row">
+                          <span class="glance-avg-label">Avg spend / day</span>
+                          <span class="glance-avg-value" id="avgSpendPerDay">£0.00</span>
+                        </div>
+                        <div class="glance-avg-row">
+                          <span class="glance-avg-label">Avg journeys / day</span>
+                          <span class="glance-avg-value" id="avgJourneysPerDay">0</span>
+                        </div>
+                        <div class="glance-avg-row glance-avg-divider">
+                          <span class="glance-avg-label">Peak journeys</span>
+                          <span class="glance-avg-value" id="peakJourneysPct">0%</span>
+                        </div>
+                        <div class="glance-avg-row">
+                          <span class="glance-avg-label">Off-peak journeys</span>
+                          <span class="glance-avg-value" id="offpeakJourneysPct">0%</span>
                         </div>
                       </div>
                     </div>
-                    <div class="insight-card">
-                      <div style="width: 100%;">
-                        <div class="insight-label">Favorite Transport</div>
-                        <div class="insight-content">
-                          <div class="insight-icon" id="favoriteTransportIcon">
-                          </div>
-                          <div class="insight-text">
-                            <div class="insight-value" id="favoriteTransportName">Underground</div>
-                            <div class="insight-subtext" id="favoriteTransportCount">0 journeys</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </div>
