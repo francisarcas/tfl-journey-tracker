@@ -1396,6 +1396,16 @@ function calculateDailyAverages() {
 }
 
 function updateStatsWidgets() {
+  // ── Scope label: show selected month name (e.g. "February 2026") ──
+  const [scopeYear, scopeAbbr] = activeMonth.split('-');
+  const scopeMonthNames = {
+    JAN:'January', FEB:'February', MAR:'March',    APR:'April',
+    MAY:'May',     JUN:'June',     JUL:'July',      AUG:'August',
+    SEP:'September', OCT:'October', NOV:'November', DEC:'December'
+  };
+  const scopeLabel = `${scopeMonthNames[scopeAbbr] || scopeAbbr} ${scopeYear}`;
+  document.getElementById('topStationsScope').textContent = scopeLabel;
+
   // ── Slide 2: Top 5 Stations ──────────────────────────────────
   const topStations = calculateTopStations();
   const topStationsList = document.getElementById('topStationsList');
