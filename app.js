@@ -511,8 +511,12 @@ function setupStationAutocomplete(inputId, suggestionsId) {
     const transport = document.getElementById('transportInput').value;
     
     if (query.length === 0) {
-      suggestionsDiv.style.display = 'none';
-      return;
+      if (transport === 'cable-car') {
+        // Fall through — show all two stations automatically on focus
+      } else {
+        suggestionsDiv.style.display = 'none';
+        return;
+      }
     }
     
     let filteredStations;
@@ -580,7 +584,8 @@ function setupStationAutocomplete(inputId, suggestionsId) {
   });
   
   input.addEventListener('focus', () => {
-    if (input.value.trim().length > 0) {
+    const transport = document.getElementById('transportInput').value;
+    if (input.value.trim().length > 0 || transport === 'cable-car') {
       input.dispatchEvent(new Event('input'));
     }
   });
