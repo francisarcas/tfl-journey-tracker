@@ -675,7 +675,7 @@ h1 {
 }
 
 .stats-name .line-badge {
-  width: 14px;
+  width: 10px;
   height: 10px;
   border-radius: 50%;
 }
@@ -1250,6 +1250,7 @@ button.disabled {
 
 .line-indicators {
   display: flex;
+  align-items: center;
   gap: 4px;
   flex-wrap: wrap;
 }
