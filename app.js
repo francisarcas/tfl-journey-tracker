@@ -58,6 +58,7 @@ function getGreeting(userName) {
 
 function capitalizeLineName(line) {
   const names = {
+    'underground': 'Underground',
     'northern': 'Northern',
     'victoria': 'Victoria',
     'central': 'Central',
