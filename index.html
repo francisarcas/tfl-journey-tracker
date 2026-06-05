@@ -300,6 +300,17 @@
         <small>This is used to compare your contactless spending vs getting an Oyster monthly Travelcard</small>
       </div>
     </div>
+
+    <div class="settings-group">
+      <label for="csvFileInput">Import Journeys</label>
+      <div class="csv-dropzone" id="csvDropzone">
+        <input id="csvFileInput" type="file" accept=".csv,text/csv">
+        <i class="fa-solid fa-file-arrow-up"></i>
+        <span>Drop Amex journey CSV here</span>
+        <small>or choose a CSV file</small>
+      </div>
+      <div class="import-status" id="importStatus" aria-live="polite"></div>
+    </div>
     
     <button class="save-settings-btn" onclick="saveSettings()">
       <i class="fa-solid fa-check"></i> Save Settings

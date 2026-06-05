@@ -58,7 +58,6 @@ function getGreeting(userName) {
 
 function capitalizeLineName(line) {
   const names = {
-    'underground': 'Underground',
     'northern': 'Northern',
     'victoria': 'Victoria',
     'central': 'Central',
@@ -314,6 +313,38 @@ async function saveJourneyToSupabase(journey) {
   return true;
 }
 
+async function saveJourneysToSupabase(journeyList) {
+  if (!currentUser || !loggedInUserProfile) {
+    alert("You must be logged in to import journeys.");
+    return false;
+  }
+
+  const rows = journeyList.map(journey => ({
+    user_id: currentUser.id,
+    household_id: loggedInUserProfile.household_id,
+    person: loggedInUserProfile.role,
+    date: journey.date,
+    time: journey.time,
+    transport: journey.transport,
+    origin: journey.origin,
+    destination: journey.destination,
+    price: journey.price,
+    month: journey.month
+  }));
+
+  const { error } = await mySupabaseClient
+    .from('journeys')
+    .insert(rows);
+
+  if (error) {
+    console.error("Error importing journeys:", error);
+    alert("Error importing journeys. Please check the console.");
+    return false;
+  }
+
+  return true;
+}
+
 async function updateJourneyInSupabase(id, journey) {
   if (!currentUser || !loggedInUserProfile) {
     alert("You must be logged in to edit a journey.");
@@ -409,6 +440,233 @@ function openSettings() {
 
 function closeSettings() {
   document.getElementById('settingsModal').classList.remove('active');
+}
+
+function setImportStatus(message, type = '') {
+  const status = document.getElementById('importStatus');
+  if (!status) return;
+
+  status.textContent = message;
+  status.className = `import-status ${type}`.trim();
+}
+
+function parseCsvLine(line) {
+  const values = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (char === '"' && inQuotes && nextChar === '"') {
+      current += '"';
+      i++;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      values.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+
+  values.push(current);
+  return values.map(value => value.trim());
+}
+
+function parseCsv(text) {
+  const lines = text
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .filter(line => line.trim().length > 0);
+
+  if (lines.length < 2) return [];
+
+  const headers = parseCsvLine(lines[0]).map(header => header.trim());
+
+  return lines.slice(1).map(line => {
+    const values = parseCsvLine(line);
+    return headers.reduce((row, header, index) => {
+      row[header] = values[index] || '';
+      return row;
+    }, {});
+  });
+}
+
+function parseCsvDate(dateValue) {
+  const parts = dateValue.split('/');
+  if (parts.length !== 3) return null;
+
+  const [day, month, year] = parts.map(part => parseInt(part, 10));
+  if (!day || !month || !year) return null;
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function getJourneyMonth(dateStr) {
+  const dateObj = new Date(dateStr + 'T00:00:00');
+  return `${dateObj.getFullYear()}-${MONTHS[dateObj.getMonth()]}`;
+}
+
+function inferTransport(origin, destination) {
+  if (!destination) return 'bus';
+
+  const originStation = getStationData(origin);
+  const destinationStation = getStationData(destination);
+  if (!originStation || !destinationStation) return 'underground';
+
+  const sharedLines = originStation.lines.filter(line => destinationStation.lines.includes(line));
+  const transportPriority = ['elizabeth', 'overground', 'dlr', 'tram', 'cable-car', 'uber-boat'];
+  const directTransport = transportPriority.find(transport => sharedLines.includes(transport));
+
+  return directTransport || 'underground';
+}
+
+function parseJourneyText(journeyText) {
+  const busMatch = journeyText.match(/^Bus Journey,\s*Route\s+(.+)$/i);
+  if (busMatch) {
+    return {
+      transport: 'bus',
+      origin: busMatch[1].trim(),
+      destination: null
+    };
+  }
+
+  const journeyParts = journeyText.split(/\s+to\s+/i);
+  if (journeyParts.length < 2) return null;
+
+  const origin = journeyParts[0].trim();
+  const destination = journeyParts.slice(1).join(' to ').trim();
+
+  return {
+    transport: inferTransport(origin, destination),
+    origin,
+    destination
+  };
+}
+
+function buildJourneyFromCsvRow(row) {
+  const date = parseCsvDate(row.Date || '');
+  const timeRange = row.Time || '';
+  const time = timeRange.split('-')[0].trim();
+  const journeyInfo = parseJourneyText(row.Journey || '');
+  const price = Math.abs(parseFloat(row['Charge (GBP)']));
+
+  if (!date || !time || !journeyInfo || !price) return null;
+
+  return {
+    date,
+    time,
+    transport: journeyInfo.transport,
+    origin: journeyInfo.origin,
+    destination: journeyInfo.destination,
+    price,
+    month: getJourneyMonth(date),
+    capped: (row.Capped || '').trim().toUpperCase() === 'Y'
+  };
+}
+
+function getJourneyDuplicateKey(journey) {
+  return [
+    journey.date,
+    journey.time,
+    journey.transport,
+    journey.origin,
+    journey.destination || '',
+    journey.price.toFixed(2)
+  ].join('|');
+}
+
+async function importJourneysFromCsvFile(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    setImportStatus('Please choose a CSV file.', 'error');
+    return;
+  }
+
+  setImportStatus('Importing journeys...');
+
+  try {
+    const text = await file.text();
+    const rows = parseCsv(text);
+    const existingKeys = new Set(journeys.map(getJourneyDuplicateKey));
+    const cappedRows = [];
+    let skippedRows = 0;
+
+    const importJourneys = rows.reduce((validJourneys, row) => {
+      const journey = buildJourneyFromCsvRow(row);
+
+      if (!journey) {
+        skippedRows++;
+        return validJourneys;
+      }
+
+      const key = getJourneyDuplicateKey(journey);
+      if (existingKeys.has(key)) {
+        skippedRows++;
+        return validJourneys;
+      }
+
+      existingKeys.add(key);
+      if (journey.capped) cappedRows.push(journey);
+
+      const { capped, ...journeyToSave } = journey;
+      validJourneys.push(journeyToSave);
+      return validJourneys;
+    }, []);
+
+    if (importJourneys.length === 0) {
+      setImportStatus(`No new journeys imported. ${skippedRows} row${skippedRows === 1 ? '' : 's'} skipped.`, 'error');
+      return;
+    }
+
+    const success = await saveJourneysToSupabase(importJourneys);
+    if (!success) return;
+
+    activeMonth = importJourneys[0].month;
+    activeYear = parseInt(importJourneys[0].date.slice(0, 4), 10);
+
+    await fetchJourneysFromSupabase();
+    updateAll();
+
+    const skippedText = skippedRows > 0 ? ` ${skippedRows} skipped.` : '';
+    const cappedText = cappedRows.length > 0 ? ` ${cappedRows.length} capped row${cappedRows.length === 1 ? '' : 's'} included.` : '';
+    setImportStatus(`Imported ${importJourneys.length} journey${importJourneys.length === 1 ? '' : 's'}.${skippedText}${cappedText}`, 'success');
+  } catch (error) {
+    console.error('CSV import failed:', error);
+    setImportStatus('Could not import this CSV. Please check the file format.', 'error');
+  }
+}
+
+function setupCsvImportDropzone() {
+  const dropzone = document.getElementById('csvDropzone');
+  const fileInput = document.getElementById('csvFileInput');
+  if (!dropzone || !fileInput) return;
+
+  fileInput.addEventListener('change', () => {
+    importJourneysFromCsvFile(fileInput.files[0]);
+    fileInput.value = '';
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add('drag-over');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove('drag-over');
+    });
+  });
+
+  dropzone.addEventListener('drop', (event) => {
+    importJourneysFromCsvFile(event.dataTransfer.files[0]);
+  });
 }
 
 function updateTravelcardCostDisplay() {
@@ -1570,6 +1828,7 @@ async function initApp() {
 
     document.getElementById('transportInput').addEventListener('change', handleTransportChange);
     document.getElementById('homeZoneSelect').addEventListener('change', updateTravelcardCostDisplay);
+    setupCsvImportDropzone();
     setupStationAutocomplete('originInput', 'originSuggestions');
     setupStationAutocomplete('destinationInput', 'destinationSuggestions');
     setupAutoPriceCalculation();
