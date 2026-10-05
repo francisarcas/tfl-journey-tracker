@@ -636,6 +636,7 @@ const TFL_STATIONS = [
   {"name": "St. James's Park", "lines": ["circle", "district"]},
   {"name": "St. John's Wood", "lines": ["jubilee"]},
   {"name": "St. Paul's", "lines": ["central"]},
+  {"name": "St Pauls", "lines": ["central"]},
   {"name": "Stamford Brook", "lines": ["district"]},
   {"name": "Stanmore", "lines": ["jubilee"]},
   {"name": "Stepney Green", "lines": ["district", "hammersmith"]},
