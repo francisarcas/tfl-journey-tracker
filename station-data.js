@@ -874,7 +874,7 @@ const TFL_STATIONS = [
   {"name": "Woodside", "lines": ["tram"]},
   
 
-  [
+  // Bus Routes
   {"name": "1", "lines": ["bus"]},
   {"name": "2", "lines": ["bus"]},
   {"name": "3", "lines": ["bus"]},
@@ -1539,6 +1539,5 @@ const TFL_STATIONS = [
   {"name": "W15", "lines": ["bus"]},
   {"name": "W16", "lines": ["bus"]},
   {"name": "W19", "lines": ["bus"]}
-]
 
 ];
