@@ -70,6 +70,7 @@ const STATION_ZONES = {
   "Goodge Street": [1],
   "Warren Street": [1],
   "St. Paul's": [1],
+  "St Pauls": [1],
   "Chancery Lane": [1],
   "Temple": [1],
   "Blackfriars": [1],
